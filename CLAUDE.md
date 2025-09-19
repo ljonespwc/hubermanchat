@@ -7,13 +7,12 @@ Building a voice-enabled AI assistant widget for the Huberman Lab website that h
 **Project ID**: `qkotdvjrsyzdcgwqsqyc`
 Always use this project_id when interacting with Supabase MCP tools.
 
-## Current Status: ✅ Scaffolding Complete
-- Project structure created and organized
-- Core components implemented
-- API routes set up
-- FAQ data scraped and stored
-- Git repository initialized
-- Ready for development server testing
+## Current Status: ✅ Layercode Integration Complete
+- Layercode voice streaming integrated
+- Simplified UX with automatic Voice Activity Detection
+- FAQ matching + OpenAI fallback implemented
+- Real-time audio streaming with visual feedback
+- Build passing, ready for testing
 
 ## Tech Stack
 - **Framework**: Next.js 14 (App Router)
@@ -39,7 +38,7 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **VoiceWidget.tsx**: Main widget controller
 - **WidgetButton.tsx**: Floating button to open widget
 - **WidgetModal.tsx**: Modal container with animations
-- **VoiceInterface.tsx**: Voice recording UI with visual feedback
+- **SimplifiedVoiceInterface.tsx**: Clean voice UI with automatic VAD (no manual controls)
 
 ### 3. API Routes (`/src/app/api/`)
 - **`/chat`**: Processes questions, matches FAQs, falls back to OpenAI
@@ -53,20 +52,21 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **supabase.ts**: Database client and types (ready to connect)
 
 ### 5. Custom Hooks (`/src/hooks/`)
-- **useVoice.ts**: Legacy Web Speech API voice recording
-- **useChat.ts**: Handles chat messages and API calls
-- **useLayercodeVoice.ts**: Layercode WebSocket integration with real-time streaming
+- **useSimpleLayercodeVoice.ts**: Simplified Layercode integration with automatic VAD
+- **useLayercodeVoice.ts**: Full Layercode integration (with transcription display)
+- **useVoice.ts**: Legacy Web Speech API
+- **useChat.ts**: Chat message handling
 
 ## User Experience Flow
 1. User clicks floating widget button
-2. Modal opens with microphone interface
-3. User clicks mic to ask a question
-4. Voice is transcribed to text
+2. Modal opens with voice interface
+3. User clicks mic once to start conversation
+4. User speaks naturally - Layercode detects when they stop (VAD)
 5. System searches FAQ database for matches
 6. If match found (>60% confidence): returns FAQ answer
-7. If no match: uses OpenAI to generate helpful response
-8. Answer is displayed and read aloud
-9. Links to relevant resources are provided
+7. If no match: streams OpenAI GPT-4.1-mini response
+8. Answer is spoken via Layercode TTS
+9. User can continue conversation naturally (no button clicks needed)
 
 ## Next Steps Required
 

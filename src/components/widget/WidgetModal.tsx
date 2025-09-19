@@ -5,8 +5,8 @@ import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 
 // Dynamically import to prevent SSR issues with Layercode SDK
-const LayercodeVoiceInterface = dynamic(
-  () => import('./LayercodeVoiceInterface'),
+const SimplifiedVoiceInterface = dynamic(
+  () => import('./SimplifiedVoiceInterface'),
   {
     ssr: false,
     loading: () => (
@@ -39,20 +39,13 @@ export default function WidgetModal({ onClose }: WidgetModalProps) {
         onClick={(e) => e.stopPropagation()}
         className="relative bg-white dark:bg-huberman-dark rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-center p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Huberman Lab Assistant
           </h2>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </button>
         </div>
 
-        <LayercodeVoiceInterface />
+        <SimplifiedVoiceInterface onClose={onClose} />
       </motion.div>
     </motion.div>
   )
