@@ -1,5 +1,7 @@
 # Huberman Lab Voice Assistant
 
+![Status: Development](https://img.shields.io/badge/Status-Development-yellow)
+
 A voice-enabled AI assistant widget for the Huberman Lab website that answers frequently asked questions using natural language processing and voice interaction.
 
 ## Features
