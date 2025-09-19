@@ -1,0 +1,214 @@
+{
+  "title": "Huberman Lab - Frequently Asked Questions",
+  "source_url": "https://www.hubermanlab.com/faq",
+  "scraped_at": "2025-09-19T16:27:18.919Z",
+  "last_updated": "2025-09-19",
+  "metadata": {
+    "description": "Find answers about the Huberman Lab podcast, merch, transcripts, Premium, sponsors, and Dr. Andrew Huberman.",
+    "language": "en-US"
+  },
+  "categories": [
+    {
+      "name": "Huberman Lab",
+      "questions": [
+        {
+          "question": "What is the Huberman Lab podcast?",
+          "answer": "The Huberman Lab podcast was started in January 2021 by Dr. Andrew Huberman, a professor of neurobiology and ophthalmology at Stanford School of Medicine. The podcast discusses neuroscience: how our brain and its connections with the organs of our body control our perceptions, our behaviors, and our health. It's separate from Dr. Huberman's teaching and research roles at Stanford."
+        },
+        {
+          "question": "Where can I listen to or watch Huberman Lab?",
+          "answer": "You can watch on YouTube and Spotify, and listen on Apple Podcasts, Spotify, Overcast, Pocket Casts, YouTube Music, Amazon Music, and virtually anywhere you get podcasts - just search \"Huberman Lab.\""
+        },
+        {
+          "question": "When are new episodes released?",
+          "answer": "On all major podcast platforms, full-length episodes are released on Mondays at 1 a.m. Pacific Time, and Huberman Lab Essentials episodes are released on Thursdays at 1 a.m. Pacific Time. On YouTube, episodes are released at 5 a.m. Pacific Time on their respective days. You can also watch our full-length episodes on X on Mondays at 7 a.m. Pacific Time."
+        },
+        {
+          "question": "Do you have merchandise?",
+          "answer": "Yes. Merch is available at shop.hubermanlab.com."
+        },
+        {
+          "question": "How can I search for specific content?",
+          "answer": "To use our on-site search, you can click the \"Search\" button in the top menu of our website or directly visit hubermanlab.com/search. We also have Ask Huberman Lab, a zero-cost AI tool designed to help you find answers related to topics covered in Huberman Lab episodes. You can ask questions in natural language, and it will provide relevant clips, timestamps, and context from past episodes."
+        },
+        {
+          "question": "Why can't I access your podcast on Google Podcasts?",
+          "answer": "Unfortunately, Google Podcasts is no longer available. If you previously used Google Podcasts, you can transfer your podcast subscriptions to YouTube Music or another podcast app."
+        }
+      ]
+    },
+    {
+      "name": "Guest & Episode Suggestions",
+      "questions": [
+        {
+          "question": "Can I suggest guests for the Huberman Lab podcast?",
+          "answer": "We don't accept inbound pitches, but you're welcome to share guest suggestions using this form. Please do not email guest suggestions."
+        }
+      ]
+    },
+    {
+      "name": "Neural Network Newsletter",
+      "questions": [
+        {
+          "question": "Do you have a newsletter?",
+          "answer": "Yes. You can join the Neural Network newsletter. It's zero-cost to join."
+        },
+        {
+          "question": "Can I access past issues of the Neural Network Newsletter?",
+          "answer": "Yes. Past issues of the newsletter are available here. Please note that the latest newsletter is usually posted to our website several weeks after it's sent to subscribers."
+        }
+      ]
+    },
+    {
+      "name": "Events & Speaking Invitations",
+      "questions": [
+        {
+          "question": "How can I attend the Huberman Lab live events?",
+          "answer": "We don't have any live events scheduled at this time, but you can join our email list to be notified when we announce upcoming events."
+        },
+        {
+          "question": "Can I invite Andrew Huberman to speak at my conference or event?",
+          "answer": "For all speaking requests, please submit your details through this form."
+        },
+        {
+          "question": "Can I invite Dr. Huberman on my podcast?",
+          "answer": "Yes. Please complete this form."
+        }
+      ]
+    },
+    {
+      "name": "Huberman Lab Premium",
+      "questions": [
+        {
+          "question": "What is Huberman Lab Premium?",
+          "answer": "By subscribing to Huberman Lab Premium, you'll get access to ask Dr. Huberman questions, exclusive bonus content (AMA episodes and Quantal Clips) and episode transcripts. A significant portion of the proceeds will fund human research (not animal models) selected by Dr. Huberman, with a dollar-for-dollar match from the Tiny Foundation."
+        },
+        {
+          "question": "What is Supercast?",
+          "answer": "Huberman Lab Premium is powered by Supercast — a podcast subscription platform used by some of the world's top podcasters. Supercast provides the technical infrastructure for Huberman Lab to offer a private, secure podcast content to Premium Members."
+        },
+        {
+          "question": "How do I listen to subscriber-exclusive podcasts and content?",
+          "answer": "Once you become a Premium Member, we will provide you with a unique podcast feed that you'll be able to add to your favorite podcast player with a couple of taps. We currently support Apple Podcasts, Spotify, Castro, Overcast, Podcast Addict, Pocket Casts, Podcast Republic, Downcast, RSSRadio, Podkicker, and more. Unfortunately, we aren't able to support podcast players that don't support importing private feeds."
+        },
+        {
+          "question": "Can I purchase a membership as a gift for somebody else?",
+          "answer": "Absolutely. You can certainly purchase a membership as a gift for somebody else. We offer several options to best suit your needs: Monthly membership (minimum of 3 months to a maximum of 12 months), Annual membership and Premium Fellowship."
+        },
+        {
+          "question": "Can I request a scholarship for Huberman Lab Premium?",
+          "answer": "We firmly believe that everyone should have access to Huberman Lab Premium, irrespective of their financial situation. We offer various scholarship amounts. If the membership cost is truly beyond your financial capacity, we invite you to apply for one of these scholarships, which can substantially reduce or even eliminate the cost. For those who are financially capable of subscribing, we encourage you to consider becoming a member. If you feel that Huberman Lab Premium doesn't deliver the value you anticipated, we'll gladly offer a full refund, no questions asked. We would like to inform you that we are currently experiencing technical difficulties with our scholarship application form. Our team is actively working to address this issue. We deeply appreciate your patience and understanding. Please continue to monitor this page for any updates regarding the resolution of the issue. Once our scholarship form is back up and running, you will be able to submit your application through the provided link."
+        },
+        {
+          "question": "Are Huberman Lab Premium Memberships tax-deductible?",
+          "answer": "Unfortunately, no. Huberman Lab Premium memberships are not tax-deductible. While we greatly appreciate your support, the cost of a membership does not qualify as a tax-deductible expense or charitable donation. Please consult with a tax professional for any further questions related to your personal tax situation."
+        },
+        {
+          "question": "Can I apply for a funding grant from Huberman Lab Premium proceeds?",
+          "answer": "Dr. Huberman individually selects scientists to support promising human subject research spanning various fields. We will reach out directly to researchers should there be interest in learning more about your work. Please note that we do not accept applications or inbound funding requests."
+        }
+      ]
+    },
+    {
+      "name": "Support for Huberman Lab Premium",
+      "questions": [
+        {
+          "question": "What is the Ask Me Anything (AMA) feature and how does it work?",
+          "answer": "As a Premium member, the AMA (Ask Me Anything) feature allows you to submit questions and upvote existing ones of interest. By accessing the dedicated AMA section, you can submit any questions you have or show support for existing ones by upvoting them. You will receive a notification by email if a question you submitted or upvoted is answered. While we'd love to answer every question, the sheer volume means we won't be able to respond to each one. However, we encourage you to submit as many questions as you'd like."
+        },
+        {
+          "question": "What does Huberman Lab Premium cost?",
+          "answer": "Huberman Lab Premium offers several subscription options to best suit your needs: the Monthly Plan is $10 per month, the Annual Plan is priced at $100 per year, and we also offer a one-time Lifetime access option. Compared to the Monthly Plan, the Annual Plan offers a discount of $20 per year, essentially giving you two months free. You can cancel your subscription at any time, at least one day before your next billing cycle. After cancellation, you will retain access to all premium content until the end of the billing cycle you've already paid for."
+        },
+        {
+          "question": "How do I update or change my credit card?",
+          "answer": "You can easily update your payment card from your account dashboard by following these steps: 1. Navigate to www.supercast.com and click Log In. 2. Upon reaching the login page, input the email you used during sign-up along with your password. If this is your first time logging in or if you have forgotten your password, click on 'Forgot Password?' A reset link will then be sent to your email. 3. After logging in, navigate to your Subscription section. 4. Locate Payment Card in the menu bar located at the top left of the page. Click on it to update your existing credit card, switch to a new one, or remove a card from your account. Once you have updated your card, if there are any outstanding invoices, our system will automatically retry payment. If the payment is successful, you will regain access to your feed. In the event there are no outstanding invoices, your card will only be charged when your next payment is due."
+        },
+        {
+          "question": "How do I change my email?",
+          "answer": "You can change your email address from your Supercast dashboard by following these steps: 1. Navigate to www.supercast.com and then click Log In. 2. Now, you'll need to provide your current email address and password. If you have forgotten your password, you can click on the 'Forgot Password?' option to reset it. 3. Once you're logged in, you'll notice a Profile Icon in the top right corner of your dashboard. Please click on this. 4. From the menu that appears, select Profile. In the profile page, you can input your new email address. After you've done so, simply click Update to save your changes."
+        },
+        {
+          "question": "How do I change my password?",
+          "answer": "Changing your password as a podcast subscriber is straightforward and can be done from your dashboard. Here are the steps: 1. Navigate to www.supercast.com and click Log In. 2. Provide your email address and password to log in to your account. Alternatively, you can use the Magic Link feature. This feature allows you to receive a login link directly to your email address, eliminating the need to enter your password. 3. After logging in, locate the Profile Icon in the upper right corner of your dashboard and click on it. 4. From the dropdown menu that appears, select the Change Password option. In the new window that opens, type your new password, confirm it, and then click on the Change Password button."
+        },
+        {
+          "question": "How can I access episode transcripts?",
+          "answer": "Episode transcripts are a premium feature and are currently available only to Huberman Lab Premium members."
+        },
+        {
+          "question": "I need additional support for my Huberman Lab Premium membership.",
+          "answer": "Please review these help articles. If you still can't find what you're looking for, email support@supercast.com. Note: Supercast support can only assist with questions related to your membership."
+        }
+      ]
+    },
+    {
+      "name": "Huberman Lab at Stanford",
+      "questions": [
+        {
+          "question": "Can I view Dr. Huberman's publications?",
+          "answer": "Yes. You can view Dr. Huberman's scientific publications on his Stanford lab website."
+        },
+        {
+          "question": "How can I learn more about Dr. Huberman's research?",
+          "answer": "Please visit Dr. Huberman's Stanford lab website."
+        },
+        {
+          "question": "How can I support Dr. Huberman's scientific research at Stanford?",
+          "answer": "If you would like to learn more about how you can support Dr. Huberman's research at Stanford School of Medicine, please visit his Stanford lab website."
+        }
+      ]
+    },
+    {
+      "name": "Dr. Andrew Huberman",
+      "questions": [
+        {
+          "question": "Who is Andrew Huberman?",
+          "answer": "Andrew Huberman, Ph.D., is a neuroscientist and tenured professor in the department of neurobiology, and by courtesy, psychiatry and behavioral sciences at Stanford School of Medicine. He has made numerous significant contributions to the fields of brain development, brain function and neural plasticity, which is the ability of our nervous system to rewire and learn new behaviors, skills and cognitive functioning."
+        },
+        {
+          "question": "Dr. Andrew Huberman Credentials",
+          "answer": "He received his Bachelor's degree from the University of California, Santa Barbara, his Master's degree from the University of California, Berkeley, and his PhD from the University of California, Davis. He completed his postdoctoral training at Stanford University."
+        },
+        {
+          "question": "Does Andrew Huberman have a dog?",
+          "answer": "He had a bulldog-mastiff named Costello (RIP) who weighed 90 lbs."
+        }
+      ]
+    },
+    {
+      "name": "Sponsors",
+      "questions": [
+        {
+          "question": "Why do you have podcast sponsors?",
+          "answer": "Our sponsors enable us to continue the ongoing production of the podcast and allow it to be zero-cost to anyone who wishes to listen and watch the podcast."
+        },
+        {
+          "question": "Are you accepting new podcast sponsors?",
+          "answer": "Not at this time. However, if you're interested in sponsoring Huberman Lab, please complete this form."
+        },
+        {
+          "question": "Who are your current podcast sponsors?",
+          "answer": "Our current podcast sponsors are AG1, BetterHelp, Carbon, David, Eight Sleep, Function Health, Helix, Joovv, Levels, LMNT, Mateína, Maui Nui Venison, Our Place, ROKA, Waking Up, Wealthfront, and WHOOP."
+        }
+      ]
+    }
+  ],
+  "additional_resources": {
+    "contact": "Need more help? Get in touch.",
+    "popular_topics": [
+      "Mental Health & Addiction",
+      "ADHD, Drive & Motivation",
+      "Neuroplasticity, Habits & Goals",
+      "Fitness & Recovery",
+      "Heat & Cold Exposure",
+      "Supplements",
+      "Light Exposure & Circadian Rhythm",
+      "Sleep"
+    ],
+    "tools": {
+      "ask_huberman_lab": "AI tool to find answers from past episodes",
+      "search": "hubermanlab.com/search"
+    }
+  }
+}
