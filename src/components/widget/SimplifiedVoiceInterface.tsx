@@ -42,8 +42,9 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
   }
 
   // Determine current state
-  const isSpeaking = userAudioLevel > 0.1
-  const isListening = agentAudioLevel > 0.1
+  // Lower threshold for user speaking detection (was 0.1, now 0.01)
+  const isSpeaking = userAudioLevel > 0.01
+  const isListening = agentAudioLevel > 0.05  // Keep agent threshold slightly higher
   const isActive = hasStarted && isConnected
 
   // Track first interaction
