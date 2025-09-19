@@ -1,8 +1,21 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import VoiceInterface from './VoiceInterface'
+
+// Dynamically import to prevent SSR issues with Layercode SDK
+const LayercodeVoiceInterface = dynamic(
+  () => import('./LayercodeVoiceInterface'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-huberman-secondary"></div>
+      </div>
+    )
+  }
+)
 
 interface WidgetModalProps {
   onClose: () => void
@@ -39,7 +52,7 @@ export default function WidgetModal({ onClose }: WidgetModalProps) {
           </button>
         </div>
 
-        <VoiceInterface />
+        <LayercodeVoiceInterface />
       </motion.div>
     </motion.div>
   )

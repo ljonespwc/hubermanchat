@@ -20,7 +20,7 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Database**: Supabase (configured but not connected)
-- **Voice**: Web Speech API (Layercode integration planned)
+- **Voice**: Layercode (WebSocket + SSE streaming)
 - **AI**: OpenAI GPT-4.1-mini
 - **State Management**: React hooks + Zustand (installed)
 - **Animation**: Framer Motion
@@ -43,17 +43,19 @@ Always use this project_id when interacting with Supabase MCP tools.
 
 ### 3. API Routes (`/src/app/api/`)
 - **`/chat`**: Processes questions, matches FAQs, falls back to OpenAI
-- **`/voice`**: Handles voice-to-text and text-to-speech (placeholder for Layercode)
+- **`/voice`**: Legacy Web Speech API handler
+- **`/layercode/authorize`**: Secure session authorization for Layercode
+- **`/layercode/webhook`**: SSE webhook handler for voice interactions
 
 ### 4. Business Logic (`/src/lib/`)
 - **faq-matcher.ts**: Intelligent FAQ matching with similarity scoring
 - **openai.ts**: GPT-4 integration for unmatched questions
 - **supabase.ts**: Database client and types (ready to connect)
-- **layercode.ts**: Voice service placeholder
 
 ### 5. Custom Hooks (`/src/hooks/`)
-- **useVoice.ts**: Manages voice recording and playback
+- **useVoice.ts**: Legacy Web Speech API voice recording
 - **useChat.ts**: Handles chat messages and API calls
+- **useLayercodeVoice.ts**: Layercode WebSocket integration with real-time streaming
 
 ## User Experience Flow
 1. User clicks floating widget button
@@ -128,9 +130,25 @@ npm run start    # Start production server
 npm run lint     # Run linter (when configured)
 ```
 
+## Layercode Integration
+
+### Architecture
+- **Frontend**: React SDK with WebSocket for real-time audio streaming
+- **Backend**: Node.js SDK with SSE for streaming AI responses
+- **Pipeline**: Voice → Layercode → Webhook → OpenAI → SSE → TTS → WebSocket → User
+
+### Key Layercode Documentation
+- **React SDK**: https://docs.layercode.com/sdk-reference/react_sdk
+- **Node.js SDK**: https://docs.layercode.com/sdk-reference/node_js_sdk
+- **Webhook SSE API**: https://docs.layercode.com/api-reference/webhook_sse_api
+
+### Configuration
+- Agent ID: `NEXT_PUBLIC_LAYERCODE_PIPELINE_ID` (in .env.local)
+- API Key: `LAYERCODE_API_KEY` (in .env.local)
+- Webhook Secret: `LAYERCODE_WEBHOOK_SECRET` (in .env.local)
+
 ## Known Limitations
-- Voice recognition requires Chrome/Edge (Web Speech API)
-- Layercode integration pending (using Web Speech API fallback)
+- Layercode requires webhook configuration in their dashboard
 - Supabase not connected yet (using local JSON file)
 - No authentication system (public access only)
 
