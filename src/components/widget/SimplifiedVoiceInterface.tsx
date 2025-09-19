@@ -79,7 +79,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
   }
 
   return (
-    <div className="relative p-8 space-y-6">
+    <div className="relative p-8 space-y-6 min-h-[320px]">
       {/* Connection Status - Subtle indicator */}
       <div className="absolute top-4 left-4 flex items-center space-x-2">
         {isConnected ? (
@@ -160,26 +160,29 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
           )}
         </motion.button>
 
-        {/* Status Text */}
-        <motion.p
-          className="text-sm text-gray-600 dark:text-gray-400 text-center"
-          key={getStatusText()}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {getStatusText()}
-        </motion.p>
+        {/* Status Text - Fixed height container */}
+        <div className="h-6 flex items-center justify-center">
+          <motion.p
+            className="text-sm text-gray-600 dark:text-gray-400 text-center"
+            key={getStatusText()}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {getStatusText()}
+          </motion.p>
+        </div>
 
-        {/* Simplified Voice Visualization */}
-        <AnimatePresence>
-          {isActive && (isSpeaking || isListening) && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center justify-center space-x-1"
-            >
+        {/* Simplified Voice Visualization - Fixed height container */}
+        <div className="h-10 flex items-center justify-center">
+          <AnimatePresence>
+            {isActive && (isSpeaking || isListening) && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center justify-center space-x-1"
+              >
               {[...Array(5)].map((_, i) => (
                 <motion.div
                   key={i}
@@ -201,9 +204,10 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                   } rounded-full`}
                 />
               ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
     </div>

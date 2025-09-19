@@ -37,7 +37,7 @@ export default function WidgetModal({ onClose }: WidgetModalProps) {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-huberman-dark rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="relative bg-white dark:bg-huberman-dark rounded-2xl shadow-2xl w-full max-w-md min-w-[400px] overflow-hidden"
       >
         <div className="flex items-center justify-center p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
