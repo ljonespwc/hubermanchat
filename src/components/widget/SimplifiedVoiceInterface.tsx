@@ -11,6 +11,7 @@ interface SimplifiedVoiceInterfaceProps {
 
 export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInterfaceProps) {
   const [hasStarted, setHasStarted] = useState(false)
+  const [hasHadFirstInteraction, setHasHadFirstInteraction] = useState(false)
 
   const {
     isConnected,
@@ -45,6 +46,13 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
   const isListening = agentAudioLevel > 0.1
   const isActive = hasStarted && isConnected
 
+  // Track first interaction
+  useEffect(() => {
+    if ((isSpeaking || isListening) && !hasHadFirstInteraction) {
+      setHasHadFirstInteraction(true)
+    }
+  }, [isSpeaking, isListening, hasHadFirstInteraction])
+
   // Get button color based on state
   const getButtonColor = () => {
     if (!isConnected) return 'bg-gray-400'
@@ -53,13 +61,20 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
     return 'bg-huberman-secondary hover:bg-huberman-accent'
   }
 
-  // Get status text
+  // Get status text - only three states, no bouncing
   const getStatusText = () => {
     if (!isConnected) return 'Connecting...'
     if (!hasStarted) return 'Click to start conversation'
+
+    // During conversation - only show these two states
     if (isSpeaking) return 'Listening to you...'
     if (isListening) return 'Speaking...'
-    return 'Go ahead, ask me anything!'
+
+    // Initial state only (before first interaction)
+    if (!hasHadFirstInteraction) return 'Ask me anything'
+
+    // After interaction has happened, show nothing during silence
+    return ' '  // Space to maintain layout
   }
 
   return (
@@ -190,19 +205,6 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
         </AnimatePresence>
       </div>
 
-      {/* Helpful hint for first-time users */}
-      {isActive && !isSpeaking && !isListening && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="absolute bottom-4 left-0 right-0 text-center"
-        >
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            Just speak naturally - I'll know when you're done
-          </p>
-        </motion.div>
-      )}
     </div>
   )
 }
