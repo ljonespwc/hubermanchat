@@ -1,6 +1,6 @@
 import { streamResponse } from '@layercode/node-server-sdk'
 import { OpenAI } from 'openai'
-import { matchFAQ } from '@/lib/faq-matcher'
+import { matchFAQEnhanced } from '@/lib/faq-matcher-enhanced'
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -39,8 +39,8 @@ export async function POST(request: Request) {
         }
 
         if (type === 'message' && text) {
-          // First, try to match with FAQ
-          const faqMatch = await matchFAQ(text)
+          // First, try to match with FAQ using enhanced matcher
+          const faqMatch = await matchFAQEnhanced(text)
 
           if (faqMatch) {
             // High confidence FAQ match - stream the answer directly
@@ -52,7 +52,8 @@ export async function POST(request: Request) {
               question: faqMatch.question,
               answer: faqMatch.answer,
               confidence: faqMatch.confidence,
-              category: faqMatch.category
+              category: faqMatch.category,
+              matchType: faqMatch.matchType // 'embedding' or 'keyword'
             })
           } else {
             // No good FAQ match - use OpenAI with streaming
