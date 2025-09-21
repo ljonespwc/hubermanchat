@@ -7,16 +7,16 @@ Building a voice-enabled AI assistant widget for the Huberman Lab website that h
 **Project ID**: `qkotdvjrsyzdcgwqsqyc`
 Always use this project_id when interacting with Supabase MCP tools.
 
-## Current Status: ✅ Pure AI Intent Matching Live
-- Layercode voice streaming integrated
-- Simplified UX with automatic Voice Activity Detection
-- **NEW: GPT-4.1-mini handles all FAQ matching**
-  - 95%+ accuracy with intent understanding
-  - ~300ms per match (no caching needed)
-  - Handles typos, synonyms, rephrasing, colloquial language
-  - No embeddings or complex infrastructure
-- Real-time audio streaming with visual feedback
-- Build passing, ready for testing
+## Current Status: ✅ Production Ready
+- **AI FAQ Matching**: GPT-4.1-mini handles all intent (95%+ accuracy, ~300ms)
+  - Generates natural conversational responses
+  - Polite declines for out-of-scope questions
+- **Voice UX**: Layercode with automatic VAD
+  - Green animations for user speaking
+  - Blue pulse/ring for AI speaking (no bars)
+  - Modal header: WiFi (left), title (center), X (right)
+- **Welcome**: Mentions covered topics (podcast, premium, newsletter, events)
+- Build passing, ready for deployment
 
 ## Tech Stack
 - **Framework**: Next.js 14 (App Router)
@@ -138,23 +138,21 @@ npm run lint     # Run linter (when configured)
 npx tsx scripts/test-ai-matcher.ts     # Test AI FAQ matching
 ```
 
-## AI Intent Matching System
+## AI FAQ System
 
-### How It Works
-1. **Direct AI Analysis**: User question sent to GPT-4.1-mini with all 35 FAQs
-2. **Intent Understanding**: AI understands semantic meaning, not just keywords
-3. **Confidence Levels**: Returns high/medium confidence or no match
-4. **No Infrastructure**: No embeddings, caching, or complex logic needed
+### Architecture
+- **Single API Call**: GPT-4.1-mini matches intent AND generates natural response
+- **No Embeddings**: Pure AI understanding (removed 600KB embedded JSON)
+- **Response Flow**: Match → Natural answer OR Context-aware decline
 
 ### Performance
-- **Match Time**: ~300ms (single API call)
-- **Accuracy**: 95%+ match rate with intent understanding
-- **Handles**: Typos, synonyms, rephrasing, colloquial language, intent
-- **Cost**: ~$0.0002 per query
+- ~300ms per query
+- 95%+ accuracy
+- $0.0002 per query
 
 ### Files
-- `docs/huberman_lab_faqs.json` - Clean FAQ data (15KB)
-- `src/lib/faq-ai-matcher.ts` - AI intent matcher
+- `docs/huberman_lab_faqs.json` - 35 FAQ pairs
+- `src/lib/faq-ai-matcher.ts` - AI matcher with natural response generation
 
 ## Layercode Integration
 
