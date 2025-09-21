@@ -153,7 +153,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
             )}
           </AnimatePresence>
 
-          {/* Audio level ring - Only show for user speaking */}
+          {/* Audio level ring - Show for user speaking only (no agent amplitudes) */}
           {isActive && isSpeaking && userAudioLevel > 0 && (
             <motion.span
               className="absolute inset-0 rounded-full border-4 border-green-300"
@@ -179,41 +179,8 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
           </motion.p>
         </div>
 
-        {/* Simplified Voice Visualization - Only for user speaking */}
-        <div className="h-10 flex items-center justify-center">
-          <AnimatePresence>
-            {isActive && isSpeaking && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="flex items-center justify-center space-x-1"
-              >
-              {[...Array(5)].map((_, i) => {
-                // Get current amplitude (0-1 range from Layercode)
-                const amplitude = userAudioLevel
-                // More sensitive scaling with variation per bar
-                const randomOffset = 0.2 + (i * 0.15) // Different base for each bar
-                const barScale = 0.3 + (amplitude * (1.5 + randomOffset)) // Max scale ~2.5
-
-                return (
-                  <motion.div
-                    key={i}
-                    animate={{
-                      scaleY: barScale
-                    }}
-                    transition={{
-                      duration: 0.05, // Fast response
-                      ease: "linear"
-                    }}
-                    className="w-1 h-6 bg-green-500 rounded-full origin-bottom"
-                  />
-                )
-              })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Removed visualizer bars - keeping empty div for spacing */}
+        <div className="h-10"></div>
       </div>
 
     </div>
