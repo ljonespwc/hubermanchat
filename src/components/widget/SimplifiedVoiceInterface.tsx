@@ -153,13 +153,15 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
             )}
           </AnimatePresence>
 
-          {/* Audio level ring - Show for user speaking only (no agent amplitudes) */}
-          {isActive && isSpeaking && userAudioLevel > 0 && (
+          {/* Audio level ring - Show for both user and AI speaking */}
+          {isActive && (userAudioLevel > 0 || agentAudioLevel > 0) && (
             <motion.span
-              className="absolute inset-0 rounded-full border-4 border-green-300"
+              className={`absolute inset-0 rounded-full border-4 ${
+                isSpeaking ? 'border-green-300' : 'border-huberman-accent'
+              }`}
               animate={{
-                scale: 1 + userAudioLevel * 0.3,
-                opacity: 0.3 + userAudioLevel * 0.5
+                scale: 1 + (isSpeaking ? userAudioLevel : agentAudioLevel) * 0.3,
+                opacity: 0.3 + (isSpeaking ? userAudioLevel : agentAudioLevel) * 0.5
               }}
               transition={{ duration: 0.1 }}
             />
