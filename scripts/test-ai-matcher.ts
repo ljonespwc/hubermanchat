@@ -73,6 +73,7 @@ async function testAIMatcher() {
         // Type guard - we know it's a FAQMatch here
         const match = result as any // FAQMatch type
         console.log(`✅ Matched (${match.confidence}): "${match.question.substring(0, 60)}..."`)
+        console.log(`   Natural: "${match.naturalAnswer?.substring(0, 100)}..."`)
         console.log(`   Category: ${match.category}`)
         console.log(`   Time: ${elapsed}ms\n`)
       }

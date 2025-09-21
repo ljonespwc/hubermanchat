@@ -16,6 +16,7 @@ function getOpenAIClient(): OpenAI {
 export interface FAQMatch {
   question: string
   answer: string
+  naturalAnswer: string  // AI's conversational version
   category: string
   confidence: 'high' | 'medium' | 'low'
 }
@@ -63,11 +64,16 @@ ${faqList.map(faq =>
 ).join('\n\n')}
 
 Instructions:
-- If there's a good match, respond with ONLY the number (1-${faqList.length})
-- If there's a partial/uncertain match, respond with "partial:NUMBER"
-- If no relevant match exists, respond with "none"
+- If there's a good match, provide your response in this exact format:
+  MATCH:NUMBER
+  NATURAL:Your natural, conversational version of the answer (2-3 sentences max, suitable for voice)
+- If there's a partial/uncertain match, use:
+  PARTIAL:NUMBER
+  NATURAL:Your natural version of the answer
+- If no relevant match exists, respond with just "none"
 - Consider intent and meaning, not just exact words
-- Examples: "What's the cost?" matches premium pricing questions, "How do I watch?" matches platform questions`
+- Make the natural answer sound friendly and conversational for voice output
+- Keep core facts accurate but rephrase for natural speech`
 
     const openai = getOpenAIClient()
     const completion = await openai.chat.completions.create({
@@ -76,27 +82,44 @@ Instructions:
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      temperature: 0.1, // Very low for consistent matching
-      max_tokens: 10 // We only need a number or "none"
+      temperature: 0.3, // Low but allows some natural variation
+      max_tokens: 200 // Need more for natural answer
     })
 
-    const response = completion.choices[0].message.content?.trim().toLowerCase() || 'none'
-    console.log(`🤖 AI matcher response for "${userQuestion}": ${response}`)
+    const response = completion.choices[0].message.content?.trim() || 'none'
+    console.log(`🤖 AI matcher response: ${response.substring(0, 100)}...`)
 
     // Parse the response
-    if (response === 'none') {
+    if (response.toLowerCase() === 'none') {
       // Generate a natural decline message
       return await generateNaturalDecline(userQuestion)
     }
 
+    // Parse the structured response
+    const lines = response.split('\n')
+    const matchLine = lines[0]?.toUpperCase() || ''
+    const naturalLine = lines[1] || ''
+
     let matchNum: number
     let confidence: 'high' | 'medium' | 'low' = 'high'
+    let naturalAnswer = ''
 
-    if (response.startsWith('partial:')) {
-      matchNum = parseInt(response.replace('partial:', ''))
+    // Extract match number and natural answer
+    if (matchLine.startsWith('MATCH:')) {
+      matchNum = parseInt(matchLine.replace('MATCH:', '').trim())
+      confidence = 'high'
+    } else if (matchLine.startsWith('PARTIAL:')) {
+      matchNum = parseInt(matchLine.replace('PARTIAL:', '').trim())
       confidence = 'medium'
     } else {
+      // Fallback for simple number response
       matchNum = parseInt(response)
+      naturalAnswer = '' // Will use original answer
+    }
+
+    // Extract natural answer if provided
+    if (naturalLine.toUpperCase().startsWith('NATURAL:')) {
+      naturalAnswer = naturalLine.replace(/^NATURAL:/i, '').trim()
     }
 
     // Validate the number
@@ -105,11 +128,12 @@ Instructions:
       return null
     }
 
-    // Return the matched FAQ
+    // Return the matched FAQ with natural answer
     const matched = faqList[matchNum - 1]
     return {
       question: matched.question,
       answer: matched.answer,
+      naturalAnswer: naturalAnswer || matched.answer, // Fallback to original
       category: matched.category,
       confidence
     }

@@ -48,15 +48,16 @@ export async function POST(request: Request) {
                 response: result.response
               })
             } else {
-              // We have a FAQ match - stream the answer directly
+              // We have a FAQ match - stream the natural answer
               const faqMatch = result as FAQMatch // Type assertion
-              stream.tts(faqMatch.answer)
+              stream.tts(faqMatch.naturalAnswer)
 
               // Send metadata about the FAQ match
               stream.data({
                 type: 'faq_match',
                 question: faqMatch.question,
-                answer: faqMatch.answer,
+                answer: faqMatch.naturalAnswer,
+                originalAnswer: faqMatch.answer,
                 confidence: faqMatch.confidence,
                 category: faqMatch.category
               })
