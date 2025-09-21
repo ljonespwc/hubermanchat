@@ -43,74 +43,57 @@ export async function POST(request: Request) {
           const faqMatch = await matchFAQEnhanced(text)
 
           if (faqMatch) {
-            // High confidence FAQ match - stream the answer directly
-            stream.tts(faqMatch.answer)
+            // High confidence FAQ match - but make it conversational
+            // Use OpenAI to make the FAQ answer sound more natural
+            const systemPrompt = `You are speaking as a friendly assistant for the Huberman Lab podcast.
+Your task is to make this FAQ answer sound natural and conversational for voice output.
+Keep the core information accurate but make it sound like natural speech.
+Be concise - aim for 2-3 sentences max.
+Do not add any information not present in the original answer.
 
-            // Send additional data to frontend for UI updates
-            stream.data({
-              type: 'faq_match',
-              question: faqMatch.question,
-              answer: faqMatch.answer,
-              confidence: faqMatch.confidence,
-              category: faqMatch.category,
-              matchType: faqMatch.matchType // 'embedding' or 'keyword'
-            })
+Original FAQ answer to rephrase:
+"${faqMatch.answer}"`
+
+            try {
+              const completion = await openai.chat.completions.create({
+                model: 'gpt-4.1-mini',
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  { role: 'user', content: 'Make this sound natural for voice.' }
+                ],
+                temperature: 0.3, // Low creativity - stay close to source
+                max_tokens: 150
+              })
+
+              const naturalAnswer = completion.choices[0].message.content || faqMatch.answer
+              stream.tts(naturalAnswer)
+
+              // Send metadata about the FAQ match
+              stream.data({
+                type: 'faq_match',
+                question: faqMatch.question,
+                answer: naturalAnswer,
+                originalAnswer: faqMatch.answer,
+                confidence: faqMatch.confidence,
+                category: faqMatch.category,
+                matchType: faqMatch.matchType
+              })
+            } catch (error) {
+              // Fallback to original answer if OpenAI fails
+              console.error('Failed to make answer conversational:', error)
+              stream.tts(faqMatch.answer)
+            }
           } else {
-            // No good FAQ match - use OpenAI with streaming
-            const systemPrompt = `You are a helpful assistant for the Huberman Lab podcast and website.
-            You help visitors find information about the podcast, premium membership, newsletter, events, and other related topics.
-            Keep your responses concise, friendly, and informative.
-            If you don't know something specific about Huberman Lab, be honest about it.`
+            // No FAQ match - politely decline to answer
+            const politeDecline = "I'm sorry, I don't have specific information about that. I can only help with questions about the Huberman Lab podcast, premium membership, newsletter, and events. Is there something else about Huberman Lab I can help you with?"
 
-            // Create a streaming completion
-            const completion = await openai.chat.completions.create({
-              model: 'gpt-4.1-mini',
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: text }
-              ],
-              stream: true,
-              temperature: 0.7,
-              max_tokens: 200
-            })
+            stream.tts(politeDecline)
 
-            // Buffer to accumulate sentences for TTS
-            let buffer = ''
-
-            for await (const chunk of completion) {
-              const content = chunk.choices[0]?.delta?.content || ''
-              buffer += content
-
-              // Stream complete sentences to TTS for natural speech
-              const sentences = buffer.match(/[^.!?]+[.!?]+/g) || []
-              if (sentences.length > 0) {
-                // Keep the last incomplete sentence in the buffer
-                const lastChar = buffer[buffer.length - 1]
-                if (['.', '!', '?'].includes(lastChar)) {
-                  // Buffer ends with punctuation, send all
-                  stream.tts(buffer)
-                  buffer = ''
-                } else {
-                  // Send complete sentences, keep the incomplete part
-                  const completeSentences = sentences.slice(0, -1)
-                  if (completeSentences.length > 0) {
-                    stream.tts(completeSentences.join(' '))
-                    buffer = sentences[sentences.length - 1]
-                  }
-                }
-              }
-            }
-
-            // Send any remaining text in the buffer
-            if (buffer.trim()) {
-              stream.tts(buffer)
-            }
-
-            // Send metadata about the AI response
+            // Send metadata about no match
             stream.data({
-              type: 'ai_response',
-              model: 'gpt-4.1-mini',
-              question: text
+              type: 'no_match',
+              question: text,
+              response: politeDecline
             })
           }
         }
