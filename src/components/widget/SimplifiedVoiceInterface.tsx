@@ -41,6 +41,16 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
     onClose()
   }
 
+  // Debug: Log amplitude values when they're non-zero
+  useEffect(() => {
+    if (userAudioLevel > 0) {
+      console.log('User amplitude:', userAudioLevel)
+    }
+    if (agentAudioLevel > 0) {
+      console.log('Agent amplitude:', agentAudioLevel)
+    }
+  }, [userAudioLevel, agentAudioLevel])
+
   // Determine current state
   // Lower threshold for user speaking detection (was 0.1, now 0.01)
   const isSpeaking = userAudioLevel > 0.01
@@ -183,27 +193,28 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="flex items-center justify-center space-x-1"
               >
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  animate={{
-                    scaleY: [
-                      1,
-                      1 + (isSpeaking ? userAudioLevel : agentAudioLevel) * (2 + Math.random()),
-                      1
-                    ],
-                  }}
-                  transition={{
-                    duration: 0.4,
-                    repeat: Infinity,
-                    delay: i * 0.1,
-                    ease: "easeInOut"
-                  }}
-                  className={`w-1 h-8 ${
-                    isSpeaking ? 'bg-red-500' : 'bg-huberman-secondary'
-                  } rounded-full`}
-                />
-              ))}
+              {[...Array(5)].map((_, i) => {
+                // Get current amplitude (0-1 range from Layercode)
+                const amplitude = isSpeaking ? userAudioLevel : agentAudioLevel
+                // Scale factor for each bar (make each one different height)
+                const barScale = 1 + amplitude * (3 + i * 0.5)
+
+                return (
+                  <motion.div
+                    key={i}
+                    animate={{
+                      scaleY: barScale
+                    }}
+                    transition={{
+                      duration: 0.1, // Fast response to amplitude changes
+                      ease: "easeOut"
+                    }}
+                    className={`w-1 h-8 ${
+                      isSpeaking ? 'bg-red-500' : 'bg-huberman-secondary'
+                    } rounded-full origin-bottom`}
+                  />
+                )
+              })}
               </motion.div>
             )}
           </AnimatePresence>
