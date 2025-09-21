@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       try {
         if (type === 'session.start') {
           // Send a welcome message when the session starts
-          stream.tts("Hello! I'm your Huberman Lab assistant. How can I help you today?")
+          stream.tts("Hello! I'm your Huberman Lab assistant. I can help with questions about the podcast, premium membership, newsletter, events, merchandise, and episode schedules. How can I help you today?")
           stream.end()
           return
         }

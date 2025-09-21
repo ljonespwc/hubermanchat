@@ -67,7 +67,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
   // Get button color based on state
   const getButtonColor = () => {
     if (!isConnected) return 'bg-gray-400'
-    if (isSpeaking) return 'bg-red-500'
+    if (isSpeaking) return 'bg-green-500'
     if (isListening) return 'bg-huberman-secondary'
     return 'bg-huberman-secondary hover:bg-huberman-accent'
   }
@@ -149,7 +149,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                   ease: "easeOut"
                 }}
                 className={`absolute inset-0 rounded-full ${
-                  isSpeaking ? 'bg-red-400' : 'bg-huberman-secondary'
+                  isSpeaking ? 'bg-green-400' : 'bg-huberman-secondary'
                 }`}
               />
             )}
@@ -159,7 +159,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
           {isActive && (userAudioLevel > 0 || agentAudioLevel > 0) && (
             <motion.span
               className={`absolute inset-0 rounded-full border-4 ${
-                isSpeaking ? 'border-red-300' : 'border-huberman-accent'
+                isSpeaking ? 'border-green-300' : 'border-huberman-accent'
               }`}
               animate={{
                 scale: 1 + (isSpeaking ? userAudioLevel : agentAudioLevel) * 0.3,
@@ -196,8 +196,10 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
               {[...Array(5)].map((_, i) => {
                 // Get current amplitude (0-1 range from Layercode)
                 const amplitude = isSpeaking ? userAudioLevel : agentAudioLevel
-                // Scale factor for each bar (make each one different height)
-                const barScale = 1 + amplitude * (3 + i * 0.5)
+                // More sensitive scaling with variation per bar
+                // Add small random offset for more natural movement
+                const randomOffset = 0.2 + (i * 0.15) // Different base for each bar
+                const barScale = 0.3 + (amplitude * (1.5 + randomOffset)) // Max scale ~2.5 instead of 4+
 
                 return (
                   <motion.div
@@ -206,11 +208,11 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                       scaleY: barScale
                     }}
                     transition={{
-                      duration: 0.1, // Fast response to amplitude changes
-                      ease: "easeOut"
+                      duration: 0.05, // Even faster for more sensitivity
+                      ease: "linear"
                     }}
-                    className={`w-1 h-8 ${
-                      isSpeaking ? 'bg-red-500' : 'bg-huberman-secondary'
+                    className={`w-1 h-6 ${
+                      isSpeaking ? 'bg-green-500' : 'bg-huberman-secondary'
                     } rounded-full origin-bottom`}
                   />
                 )
