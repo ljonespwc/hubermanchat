@@ -1,11 +1,5 @@
 import { streamResponse } from '@layercode/node-server-sdk'
-import { OpenAI } from 'openai'
-import { matchFAQEnhanced } from '@/lib/faq-matcher-enhanced'
-
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-})
+import { matchFAQWithAI, type FAQMatch, type NoMatchResponse } from '@/lib/faq-ai-matcher'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,61 +33,48 @@ export async function POST(request: Request) {
         }
 
         if (type === 'message' && text) {
-          // First, try to match with FAQ using enhanced matcher
-          const faqMatch = await matchFAQEnhanced(text)
+          // Use AI to match with FAQ
+          const result = await matchFAQWithAI(text)
 
-          if (faqMatch) {
-            // High confidence FAQ match - but make it conversational
-            // Use OpenAI to make the FAQ answer sound more natural
-            const systemPrompt = `You are speaking as a friendly assistant for the Huberman Lab podcast.
-Your task is to make this FAQ answer sound natural and conversational for voice output.
-Keep the core information accurate but make it sound like natural speech.
-Be concise - aim for 2-3 sentences max.
-Do not add any information not present in the original answer.
+          if (result) {
+            if ('type' in result && result.type === 'no_match') {
+              // AI generated a natural decline message
+              stream.tts(result.response)
 
-Original FAQ answer to rephrase:
-"${faqMatch.answer}"`
-
-            try {
-              const completion = await openai.chat.completions.create({
-                model: 'gpt-4.1-mini',
-                messages: [
-                  { role: 'system', content: systemPrompt },
-                  { role: 'user', content: 'Make this sound natural for voice.' }
-                ],
-                temperature: 0.3, // Low creativity - stay close to source
-                max_tokens: 150
+              // Send metadata about no match
+              stream.data({
+                type: 'no_match',
+                question: text,
+                response: result.response
               })
-
-              const naturalAnswer = completion.choices[0].message.content || faqMatch.answer
-              stream.tts(naturalAnswer)
+            } else {
+              // We have a FAQ match - stream the answer directly
+              const faqMatch = result as FAQMatch // Type assertion
+              stream.tts(faqMatch.answer)
 
               // Send metadata about the FAQ match
               stream.data({
                 type: 'faq_match',
                 question: faqMatch.question,
-                answer: naturalAnswer,
-                originalAnswer: faqMatch.answer,
+                answer: faqMatch.answer,
                 confidence: faqMatch.confidence,
-                category: faqMatch.category,
-                matchType: faqMatch.matchType
+                category: faqMatch.category
               })
-            } catch (error) {
-              // Fallback to original answer if OpenAI fails
-              console.error('Failed to make answer conversational:', error)
-              stream.tts(faqMatch.answer)
+
+              // If it's a medium confidence match, add a follow-up
+              if (faqMatch.confidence === 'medium') {
+                stream.tts(" Was that what you were looking for?")
+              }
             }
           } else {
-            // No FAQ match - politely decline to answer
-            const politeDecline = "I'm sorry, I don't have specific information about that. I can only help with questions about the Huberman Lab podcast, premium membership, newsletter, and events. Is there something else about Huberman Lab I can help you with?"
+            // Fallback if something went wrong
+            const fallbackDecline = "I'm sorry, I don't have specific information about that. Is there something else about Huberman Lab I can help you with?"
+            stream.tts(fallbackDecline)
 
-            stream.tts(politeDecline)
-
-            // Send metadata about no match
             stream.data({
               type: 'no_match',
               question: text,
-              response: politeDecline
+              response: fallbackDecline
             })
           }
         }

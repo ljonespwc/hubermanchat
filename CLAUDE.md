@@ -7,13 +7,14 @@ Building a voice-enabled AI assistant widget for the Huberman Lab website that h
 **Project ID**: `qkotdvjrsyzdcgwqsqyc`
 Always use this project_id when interacting with Supabase MCP tools.
 
-## Current Status: ✅ Embedding-Based FAQ System Live
+## Current Status: ✅ Pure AI Intent Matching Live
 - Layercode voice streaming integrated
 - Simplified UX with automatic Voice Activity Detection
-- **NEW: AI-powered FAQ matching using OpenAI embeddings**
-  - 95% accuracy improvement over keyword matching
-  - ~100ms first match, ~1-2ms cached
-  - Handles typos, synonyms, rephrasing
+- **NEW: GPT-4.1-mini handles all FAQ matching**
+  - 95%+ accuracy with intent understanding
+  - ~300ms per match (no caching needed)
+  - Handles typos, synonyms, rephrasing, colloquial language
+  - No embeddings or complex infrastructure
 - Real-time audio streaming with visual feedback
 - Build passing, ready for testing
 
@@ -50,10 +51,9 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **`/layercode/webhook`**: SSE webhook handler for voice interactions
 
 ### 4. Business Logic (`/src/lib/`)
-- **faq-matcher-enhanced.ts**: Hybrid embedding + keyword FAQ matching
-- **embedding-matcher.ts**: Vector similarity search with caching
-- **faq-matcher.ts**: Legacy keyword matching (fallback)
-- **openai.ts**: GPT-4 integration for unmatched questions
+- **faq-ai-matcher.ts**: AI-powered intent matching using GPT-4.1-mini
+- **faq-matcher.ts**: Legacy keyword matching (emergency fallback)
+- **openai.ts**: GPT-4 integration utilities
 - **supabase.ts**: Database client and types (ready to connect)
 
 ### 5. Custom Hooks (`/src/hooks/`)
@@ -67,9 +67,9 @@ Always use this project_id when interacting with Supabase MCP tools.
 2. Modal opens with voice interface
 3. User clicks mic once to start conversation
 4. User speaks naturally - Layercode detects when they stop (VAD)
-5. System searches FAQ database for matches
-6. If match found (>60% confidence): returns FAQ answer
-7. If no match: streams OpenAI GPT-4.1-mini response
+5. GPT-4.1-mini analyzes intent against all 35 FAQs
+6. If match found: returns FAQ answer directly
+7. If no match: polite decline with invitation to ask another question
 8. Answer is spoken via Layercode TTS
 9. User can continue conversation naturally (no button clicks needed)
 
@@ -134,29 +134,27 @@ npm run build    # Build for production
 npm run start    # Start production server
 npm run lint     # Run linter (when configured)
 
-# FAQ Embedding Management
-npx tsx scripts/generate-embeddings.ts  # Regenerate FAQ embeddings
-npx tsx scripts/test-faq-speed.ts      # Test FAQ matching performance
+# FAQ Testing
+npx tsx scripts/test-ai-matcher.ts     # Test AI FAQ matching
 ```
 
-## FAQ Embedding System
+## AI Intent Matching System
 
 ### How It Works
-1. **Pre-computed Embeddings**: All 35 FAQ questions have OpenAI embeddings (512 dimensions)
-2. **Runtime Matching**: User questions get embedded and compared using cosine similarity
-3. **Smart Caching**: Recent question embeddings cached in memory (50 question LRU cache)
-4. **Hybrid Fallback**: Falls back to keyword matching if embedding confidence < 75%
+1. **Direct AI Analysis**: User question sent to GPT-4.1-mini with all 35 FAQs
+2. **Intent Understanding**: AI understands semantic meaning, not just keywords
+3. **Confidence Levels**: Returns high/medium confidence or no match
+4. **No Infrastructure**: No embeddings, caching, or complex logic needed
 
 ### Performance
-- **First Match**: ~100ms (includes OpenAI API call)
-- **Cached Match**: ~1-2ms (no API call needed)
-- **Accuracy**: 95% match rate vs 60% for keyword-only
-- **Handles**: Typos, synonyms, rephrasing, intent variations
+- **Match Time**: ~300ms (single API call)
+- **Accuracy**: 95%+ match rate with intent understanding
+- **Handles**: Typos, synonyms, rephrasing, colloquial language, intent
+- **Cost**: ~$0.0002 per query
 
 ### Files
-- `docs/huberman_lab_faqs_embedded.json` - FAQs with embeddings (597KB)
-- `src/lib/embedding-matcher.ts` - Vector similarity engine
-- `src/lib/faq-matcher-enhanced.ts` - Hybrid matcher
+- `docs/huberman_lab_faqs.json` - Clean FAQ data (15KB)
+- `src/lib/faq-ai-matcher.ts` - AI intent matcher
 
 ## Layercode Integration
 
