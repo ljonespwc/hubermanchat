@@ -90,25 +90,23 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
 
   return (
     <div className="relative p-8 space-y-6 min-h-[320px]">
-      {/* Connection Status - Subtle indicator */}
-      <div className="absolute top-4 left-4 flex items-center space-x-2">
+      {/* Connection Status - Upper left */}
+      <div className="absolute top-6 left-6 flex items-center space-x-2">
         {isConnected ? (
-          <Wifi className="w-3 h-3 text-green-500" />
+          <Wifi className="w-4 h-4 text-green-500" />
         ) : (
-          <WifiOff className="w-3 h-3 text-gray-400" />
+          <WifiOff className="w-4 h-4 text-gray-400" />
         )}
       </div>
 
-      {/* End Conversation Button */}
-      {isActive && (
-        <button
-          onClick={handleEndConversation}
-          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          aria-label="End conversation"
-        >
-          <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-        </button>
-      )}
+      {/* Close Modal Button - Upper right */}
+      <button
+        onClick={onClose}
+        className="absolute top-6 right-6 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        aria-label="Close modal"
+      >
+        <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+      </button>
 
       {/* Main Interface */}
       <div className="flex flex-col items-center space-y-6">
@@ -155,15 +153,13 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
             )}
           </AnimatePresence>
 
-          {/* Audio level ring */}
-          {isActive && (userAudioLevel > 0 || agentAudioLevel > 0) && (
+          {/* Audio level ring - Only show for user speaking */}
+          {isActive && isSpeaking && userAudioLevel > 0 && (
             <motion.span
-              className={`absolute inset-0 rounded-full border-4 ${
-                isSpeaking ? 'border-green-300' : 'border-huberman-accent'
-              }`}
+              className="absolute inset-0 rounded-full border-4 border-green-300"
               animate={{
-                scale: 1 + (isSpeaking ? userAudioLevel : agentAudioLevel) * 0.3,
-                opacity: 0.3 + (isSpeaking ? userAudioLevel : agentAudioLevel) * 0.5
+                scale: 1 + userAudioLevel * 0.3,
+                opacity: 0.3 + userAudioLevel * 0.5
               }}
               transition={{ duration: 0.1 }}
             />
@@ -183,10 +179,10 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
           </motion.p>
         </div>
 
-        {/* Simplified Voice Visualization - Fixed height container */}
+        {/* Simplified Voice Visualization - Only for user speaking */}
         <div className="h-10 flex items-center justify-center">
           <AnimatePresence>
-            {isActive && (isSpeaking || isListening) && (
+            {isActive && isSpeaking && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -195,11 +191,10 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
               >
               {[...Array(5)].map((_, i) => {
                 // Get current amplitude (0-1 range from Layercode)
-                const amplitude = isSpeaking ? userAudioLevel : agentAudioLevel
+                const amplitude = userAudioLevel
                 // More sensitive scaling with variation per bar
-                // Add small random offset for more natural movement
                 const randomOffset = 0.2 + (i * 0.15) // Different base for each bar
-                const barScale = 0.3 + (amplitude * (1.5 + randomOffset)) // Max scale ~2.5 instead of 4+
+                const barScale = 0.3 + (amplitude * (1.5 + randomOffset)) // Max scale ~2.5
 
                 return (
                   <motion.div
@@ -208,12 +203,10 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                       scaleY: barScale
                     }}
                     transition={{
-                      duration: 0.05, // Even faster for more sensitivity
+                      duration: 0.05, // Fast response
                       ease: "linear"
                     }}
-                    className={`w-1 h-6 ${
-                      isSpeaking ? 'bg-green-500' : 'bg-huberman-secondary'
-                    } rounded-full origin-bottom`}
+                    className="w-1 h-6 bg-green-500 rounded-full origin-bottom"
                   />
                 )
               })}
