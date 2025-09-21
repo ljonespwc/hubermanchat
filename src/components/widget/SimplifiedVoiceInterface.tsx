@@ -29,19 +29,10 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
       timestamp: new Date().toISOString()
     },
     onDataMessage: (data) => {
-      console.log('📨 Received data message:', data)
-      console.log('📨 Full data structure:', JSON.stringify(data, null, 2))
-
-      // Try different data access patterns
-      const urls = data?.urls || data?.data?.urls || (data?.type === 'faq_match' && data)
-
-      if (urls) {
-        console.log('🔗 URL data found:', urls)
-        // If urls is the whole data object with type='faq_match', extract urls property
-        const urlData = urls.urls || urls
-
+      // The data comes wrapped in {type: 'response.data', content: {...}}
+      if (data?.type === 'response.data' && data.content?.urls) {
+        const urlData = data.content.urls
         if (urlData?.hasLinks) {
-          console.log('✅ Setting showURLs to true with links:', urlData.links)
           setCurrentURLs(urlData)
           setShowURLs(true)
         }
@@ -63,15 +54,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
     onClose()
   }
 
-  // Debug: Log amplitude values when they're non-zero
-  useEffect(() => {
-    if (userAudioLevel > 0) {
-      console.log('User amplitude:', userAudioLevel)
-    }
-    if (agentAudioLevel > 0) {
-      console.log('Agent amplitude:', agentAudioLevel)
-    }
-  }, [userAudioLevel, agentAudioLevel])
+  // Removed amplitude logging - was too noisy
 
   // Determine current state
   // Lower threshold for user speaking detection (was 0.1, now 0.01)
@@ -97,10 +80,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
     }
   }, [isListening, showURLs])
 
-  // Debug current state
-  useEffect(() => {
-    console.log('🎯 Render state - showURLs:', showURLs, 'currentURLs:', currentURLs, 'isListening:', isListening)
-  }, [showURLs, currentURLs, isListening])
+  // Removed debug logging
 
   // Get button color based on state
   const getButtonColor = () => {
