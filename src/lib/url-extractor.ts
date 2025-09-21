@@ -22,13 +22,16 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
 
   if (matches) {
     matches.forEach(match => {
+      // Remove trailing punctuation (periods, commas, etc.)
+      const cleanMatch = match.replace(/[.,;!?]$/, '')
+
       // Clean up the URL
-      const cleanUrl = match.startsWith('http') ? match :
-                      match.startsWith('www.') ? `https://${match}` :
-                      `https://${match}`
+      const cleanUrl = cleanMatch.startsWith('http') ? cleanMatch :
+                      cleanMatch.startsWith('www.') ? `https://${cleanMatch}` :
+                      `https://${cleanMatch}`
       links.push({
         type: 'url',
-        text: match,
+        text: cleanMatch,
         href: cleanUrl
       })
     })
