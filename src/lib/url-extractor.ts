@@ -37,24 +37,45 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
     })
   }
 
-  // Check for vague link references
+  // Check for vague link references and provide actual URLs
   const vagueReferences = [
-    { pattern: /using this form/i, placeholder: '[Form link - visit hubermanlab.com/faq]' },
-    { pattern: /through this form/i, placeholder: '[Form link - visit hubermanlab.com/faq]' },
-    { pattern: /complete this form/i, placeholder: '[Form link - visit hubermanlab.com/faq]' },
-    { pattern: /available here/i, placeholder: '[Link - visit hubermanlab.com/faq]' },
-    { pattern: /review these help articles/i, placeholder: '[Help articles - visit support.supercast.com]' },
-    { pattern: /Stanford lab website/i, placeholder: '[Stanford lab - visit profiles.stanford.edu/andrew-huberman]' },
-    { pattern: /join the Neural Network newsletter/i, placeholder: '[Newsletter signup - visit hubermanlab.com]' },
-    { pattern: /join our email list/i, placeholder: '[Email signup - visit hubermanlab.com]' },
+    // Guest suggestions form
+    { pattern: /share guest suggestions using this form/i, url: 'https://airtable.com/app3khvqyh3rdqa5g/pagmOcc3BAw8FIxDO/form' },
+    // Speaking requests form
+    { pattern: /submit your details through this form/i, url: 'https://airtable.com/appzMBzeGsDceqhoE/paglHM1ukVBcpOrGd/form' },
+    // Podcast invitation form
+    { pattern: /complete this form.*podcast/i, url: 'https://airtable.com/appDg88FrbCxePxpG/pagsREmsmZogaB9VQ/form' },
+    // Sponsor interest form
+    { pattern: /complete this form.*sponsor/i, url: 'https://airtable.com/app9yIGPaaYyDlhxz/pagIHDejSMThpcqSN/form' },
+    // Newsletter signup
+    { pattern: /join the Neural Network newsletter/i, url: 'https://www.hubermanlab.com/newsletter' },
+    // Email list for events
+    { pattern: /join our email list/i, url: 'https://www.hubermanlab.com/events' },
+    // Past newsletters
+    { pattern: /available here/i, url: 'https://www.hubermanlab.com/newsletter' },
+    // Help articles
+    { pattern: /review these help articles/i, url: 'https://support.supercast.com/category/53-subscriber-support' },
+    // Stanford lab website - publications
+    { pattern: /Stanford lab website.*publications/i, url: 'https://hubermanlab.stanford.edu/publications' },
+    // Stanford lab website - research
+    { pattern: /Stanford lab website.*research/i, url: 'https://hubermanlab.stanford.edu/giving' },
+    // Stanford lab website - general
+    { pattern: /Stanford lab website/i, url: 'https://hubermanlab.stanford.edu/' },
   ]
 
-  vagueReferences.forEach(({ pattern, placeholder }) => {
-    if (pattern.test(answer) && !links.some(link => link.text === placeholder)) {
-      links.push({
-        type: 'placeholder',
-        text: placeholder
-      })
+  vagueReferences.forEach(({ pattern, url }) => {
+    if (pattern.test(answer)) {
+      // Extract the domain name for display text
+      const displayText = url.replace(/^https?:\/\//, '').split('/')[0]
+
+      // Check if we haven't already added this URL
+      if (!links.some(link => link.href === url)) {
+        links.push({
+          type: 'url',
+          text: displayText,
+          href: url
+        })
+      }
     }
   })
 
