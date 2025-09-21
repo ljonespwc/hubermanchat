@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 
 interface UseSimpleLayercodeVoiceOptions {
   metadata?: Record<string, any>
+  onDataMessage?: (data: any) => void
 }
 
 export function useLayercodeVoice(options: UseSimpleLayercodeVoiceOptions = {}) {
@@ -36,8 +37,12 @@ export function useLayercodeVoice(options: UseSimpleLayercodeVoiceOptions = {}) 
       console.error('Layercode error:', error)
     },
     onDataMessage: (data) => {
-      // Log data for debugging, but don't display it
+      // Log data for debugging
       console.log('Agent data:', data)
+      // Pass through to parent component if handler provided
+      if (options.onDataMessage) {
+        options.onDataMessage(data)
+      }
     }
   })
 

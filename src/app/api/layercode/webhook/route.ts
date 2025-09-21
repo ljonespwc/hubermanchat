@@ -1,5 +1,6 @@
 import { streamResponse } from '@layercode/node-server-sdk'
 import { matchFAQWithAI, type FAQMatch, type NoMatchResponse } from '@/lib/faq-ai-matcher'
+import { extractURLsFromAnswer } from '@/lib/url-extractor'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,21 +46,26 @@ export async function POST(request: Request) {
               stream.data({
                 type: 'no_match',
                 question: text,
-                response: result.response
+                response: result.response,
+                urls: { hasLinks: false, links: [] }
               })
             } else {
               // We have a FAQ match - stream the natural answer
               const faqMatch = result as FAQMatch // Type assertion
               stream.tts(faqMatch.naturalAnswer)
 
-              // Send metadata about the FAQ match
+              // Extract URLs from the original answer
+              const urlData = extractURLsFromAnswer(faqMatch.answer)
+
+              // Send metadata about the FAQ match with URL data
               stream.data({
                 type: 'faq_match',
                 question: faqMatch.question,
                 answer: faqMatch.naturalAnswer,
                 originalAnswer: faqMatch.answer,
                 confidence: faqMatch.confidence,
-                category: faqMatch.category
+                category: faqMatch.category,
+                urls: urlData
               })
 
               // If it's a medium confidence match, add a follow-up
@@ -75,7 +81,8 @@ export async function POST(request: Request) {
             stream.data({
               type: 'no_match',
               question: text,
-              response: fallbackDecline
+              response: fallbackDecline,
+              urls: { hasLinks: false, links: [] }
             })
           }
         }

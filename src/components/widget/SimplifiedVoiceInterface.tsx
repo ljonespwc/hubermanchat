@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Mic, Volume2, Loader2 } from 'lucide-react'
+import { Mic, Volume2, Loader2, ExternalLink } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLayercodeVoice } from '@/hooks/useSimpleLayercodeVoice'
+import type { ExtractedLink, URLExtractionResult } from '@/lib/url-extractor'
 
 interface SimplifiedVoiceInterfaceProps {
   onClose: () => void
@@ -12,6 +13,8 @@ interface SimplifiedVoiceInterfaceProps {
 export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInterfaceProps) {
   const [hasStarted, setHasStarted] = useState(false)
   const [hasHadFirstInteraction, setHasHadFirstInteraction] = useState(false)
+  const [currentURLs, setCurrentURLs] = useState<URLExtractionResult | null>(null)
+  const [showURLs, setShowURLs] = useState(false)
 
   const {
     isConnected,
@@ -24,6 +27,15 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
     metadata: {
       source: 'huberman-lab-widget',
       timestamp: new Date().toISOString()
+    },
+    onDataMessage: (data) => {
+      // Handle URL data from the webhook
+      if (data?.urls) {
+        setCurrentURLs(data.urls)
+        if (data.urls.hasLinks) {
+          setShowURLs(true)
+        }
+      }
     }
   })
 
@@ -63,6 +75,17 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
       setHasHadFirstInteraction(true)
     }
   }, [isSpeaking, isListening, hasHadFirstInteraction])
+
+  // Hide URLs when agent stops speaking
+  useEffect(() => {
+    if (!isListening && showURLs) {
+      // Keep URLs visible for a moment after speaking stops
+      const timer = setTimeout(() => {
+        setShowURLs(false)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [isListening, showURLs])
 
   // Get button color based on state
   const getButtonColor = () => {
@@ -171,8 +194,40 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
           </motion.p>
         </div>
 
-        {/* Removed visualizer bars - keeping empty div for spacing */}
-        <div className="h-10"></div>
+        {/* URL Display Area */}
+        <div className="h-10 flex items-center justify-center">
+          <AnimatePresence>
+            {showURLs && currentURLs?.hasLinks && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-1 text-center"
+              >
+                {currentURLs.links.map((link, index) => (
+                  <div key={index} className="text-xs text-gray-500 dark:text-gray-400">
+                    {link.type === 'url' ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 hover:text-huberman-secondary transition-colors underline"
+                      >
+                        {link.text}
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <span className="text-gray-400 italic">
+                        {link.text}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
     </div>
