@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Mic, Volume2, Loader2, WifiOff, Wifi, X } from 'lucide-react'
+import { Mic, Volume2, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLayercodeVoice } from '@/hooks/useSimpleLayercodeVoice'
 
@@ -88,25 +88,15 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
     return ' '  // Space to maintain layout
   }
 
+  // Pass connection status to parent
+  useEffect(() => {
+    if (window && (window as any).updateConnectionStatus) {
+      (window as any).updateConnectionStatus(isConnected)
+    }
+  }, [isConnected])
+
   return (
     <div className="relative p-8 space-y-6 min-h-[320px]">
-      {/* Connection Status - Upper left */}
-      <div className="absolute top-6 left-6 flex items-center space-x-2">
-        {isConnected ? (
-          <Wifi className="w-4 h-4 text-green-500" />
-        ) : (
-          <WifiOff className="w-4 h-4 text-gray-400" />
-        )}
-      </div>
-
-      {/* Close Modal Button - Upper right */}
-      <button
-        onClick={onClose}
-        className="absolute top-6 right-6 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        aria-label="Close modal"
-      >
-        <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-      </button>
 
       {/* Main Interface */}
       <div className="flex flex-col items-center space-y-6">
