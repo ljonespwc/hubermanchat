@@ -37,8 +37,11 @@ export function useLayercodeVoice(options: UseSimpleLayercodeVoiceOptions = {}) 
       console.error('Layercode error:', error)
     },
     onDataMessage: (data) => {
-      // Log data for debugging
-      console.log('Agent data:', data)
+      // Enhanced debugging
+      console.log('🎤 Layercode onDataMessage received:', data)
+      console.log('🎤 Data type:', typeof data)
+      console.log('🎤 Data keys:', data ? Object.keys(data) : 'null/undefined')
+
       // Pass through to parent component if handler provided
       if (options.onDataMessage) {
         options.onDataMessage(data)

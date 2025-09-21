@@ -56,6 +56,7 @@ export async function POST(request: Request) {
 
               // Extract URLs from the original answer
               const urlData = extractURLsFromAnswer(faqMatch.answer)
+              console.log('🔍 Extracted URLs from answer:', urlData)
 
               // Send metadata about the FAQ match with URL data
               stream.data({

@@ -29,10 +29,20 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
       timestamp: new Date().toISOString()
     },
     onDataMessage: (data) => {
-      // Handle URL data from the webhook
-      if (data?.urls) {
-        setCurrentURLs(data.urls)
-        if (data.urls.hasLinks) {
+      console.log('📨 Received data message:', data)
+      console.log('📨 Full data structure:', JSON.stringify(data, null, 2))
+
+      // Try different data access patterns
+      const urls = data?.urls || data?.data?.urls || (data?.type === 'faq_match' && data)
+
+      if (urls) {
+        console.log('🔗 URL data found:', urls)
+        // If urls is the whole data object with type='faq_match', extract urls property
+        const urlData = urls.urls || urls
+
+        if (urlData?.hasLinks) {
+          console.log('✅ Setting showURLs to true with links:', urlData.links)
+          setCurrentURLs(urlData)
           setShowURLs(true)
         }
       }
@@ -86,6 +96,11 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
       return () => clearTimeout(timer)
     }
   }, [isListening, showURLs])
+
+  // Debug current state
+  useEffect(() => {
+    console.log('🎯 Render state - showURLs:', showURLs, 'currentURLs:', currentURLs, 'isListening:', isListening)
+  }, [showURLs, currentURLs, isListening])
 
   // Get button color based on state
   const getButtonColor = () => {
@@ -195,7 +210,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
         </div>
 
         {/* URL Display Area */}
-        <div className="h-10 flex items-center justify-center">
+        <div className="min-h-[40px] flex items-center justify-center">
           <AnimatePresence>
             {showURLs && currentURLs?.hasLinks && (
               <motion.div
