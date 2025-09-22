@@ -19,9 +19,9 @@ A voice-enabled AI assistant widget for the Huberman Lab website that answers fr
 - **Framework:** Next.js 14 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
-- **Database:** Supabase (optional)
-- **AI:** OpenAI GPT-4
-- **Voice:** Web Speech API (Layercode ready)
+- **Database:** Supabase
+- **AI:** OpenAI GPT-4.1-mini
+- **Voice:** Layercode (WebSocket + SSE)
 - **Animation:** Framer Motion
 - **Deployment:** Vercel
 
@@ -86,14 +86,10 @@ To embed the widget on any page:
 
 ```html
 <!-- Add to your HTML -->
-<script src="https://your-domain.com/widget.js"></script>
-<script>
-  HubermanChatWidget.init({
-    position: 'bottom-right',
-    theme: 'auto'
-  });
-</script>
+<script src="https://hubermanchat.vercel.app/widget.js"></script>
 ```
+
+The widget will automatically initialize and appear as a floating button in the bottom-right corner.
 
 ## API Endpoints
 
@@ -122,7 +118,15 @@ This project is configured for easy deployment on Vercel:
 
 1. Push to GitHub
 2. Import project in Vercel
-3. Add environment variables
+3. Add environment variables:
+   - `OPENAI_API_KEY` - Your OpenAI API key
+   - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon key
+   - `SUPABASE_SERVICE_KEY` (optional) - For enhanced database access
+   - `LAYERCODE_API_KEY` - Your Layercode API key
+   - `NEXT_PUBLIC_LAYERCODE_PIPELINE_ID` - Your Layercode pipeline ID
+   - `LAYERCODE_WEBHOOK_SECRET` - Your Layercode webhook secret
+   - `NEXT_PUBLIC_APP_URL` - Your production URL (e.g., https://hubermanchat.vercel.app)
 4. Deploy
 
 ## Contributing
