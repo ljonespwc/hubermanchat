@@ -17,13 +17,26 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
   const links: ExtractedLink[] = []
 
   // Pattern to match explicit URLs (domains)
-  const urlPattern = /(?:www\.|https?:\/\/)?([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?:\/[^\s]*)?)/g
+  // Improved to avoid matching Ph.D, M.D., etc.
+  const urlPattern = /(?:www\.|https?:\/\/)?([a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)?)/g
   const matches = answer.match(urlPattern)
 
   if (matches) {
     matches.forEach(match => {
+      // Skip common abbreviations that aren't URLs
+      if (match.match(/^(Ph\.D|M\.D|Dr\.|Mr\.|Ms\.|Mrs\.|Prof\.|Inc\.|Ltd\.|LLC)/i)) {
+        return
+      }
+
       // Remove trailing punctuation (periods, commas, etc.)
       const cleanMatch = match.replace(/[.,;!?]$/, '')
+
+      // Validate it looks like a real domain (has at least one dot and TLD is 2+ chars)
+      const parts = cleanMatch.split('.')
+      const tld = parts[parts.length - 1]
+      if (!cleanMatch.includes('.') || !tld || tld.length < 2) {
+        return
+      }
 
       // Clean up the URL
       const cleanUrl = cleanMatch.startsWith('http') ? cleanMatch :

@@ -7,6 +7,13 @@ Building a voice-enabled AI assistant widget for the Huberman Lab website that h
 **Project ID**: `qkotdvjrsyzdcgwqsqyc`
 Always use this project_id when interacting with Supabase MCP tools.
 
+## Recent Updates (Sept 22, 2025)
+- **Admin Dashboard**: MVP analytics at `/admin` with embed code
+- **Widget Embed**: Simple one-line script installation
+- **Conversation Tracking**: Automatic tracking to Supabase
+- **URL Bug Fix**: Fixed Ph.D and abbreviations showing as URLs
+- **Blue Color Update**: Changed to #00AFEF throughout
+
 ## Current Status: ✅ Production Ready
 - **AI FAQ Matching**: GPT-4.1-mini handles all intent (95%+ accuracy, ~300ms)
   - Generates natural conversational responses
@@ -37,6 +44,13 @@ Always use this project_id when interacting with Supabase MCP tools.
 
 ## What's Been Built
 
+### NEW: Admin Dashboard & Widget System
+- **`/admin` Dashboard**: View stats, get embed code, see conversations
+- **`/widget` Embed**: Standalone page for iframe embedding
+- **`widget.js`**: One-line embed script for any website
+- **Supabase Analytics**: `conversations` table tracking all Q&A
+- **API Endpoints**: `/api/track` (fast tracking), `/api/stats` (dashboard data)
+
 ### 1. Data Layer
 - **FAQ Data**: Scraped from hubermanlab.com/faq
   - 36 Q&A pairs across 9 categories
@@ -59,8 +73,8 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **faq-ai-matcher.ts**: AI-powered intent matching using GPT-4.1-mini
 - **faq-matcher.ts**: Legacy keyword matching (emergency fallback)
 - **openai.ts**: GPT-4 integration utilities
-- **supabase.ts**: Database client and types (ready to connect)
-- **url-extractor.ts**: Extracts and maps URLs from FAQ answers (with full paths)
+- **supabase.ts**: Database client and types (now connected for analytics)
+- **url-extractor.ts**: Extracts URLs, filters out Ph.D/abbreviations
 
 ### 5. Custom Hooks (`/src/hooks/`)
 - **useSimpleLayercodeVoice.ts**: Simplified Layercode integration with automatic VAD
@@ -79,6 +93,17 @@ Always use this project_id when interacting with Supabase MCP tools.
 8. Answer is spoken via Layercode TTS
 9. Relevant URLs display below voice animation (if answer contains links)
 10. User can continue conversation naturally (no button clicks needed)
+
+## Quick Start
+
+### Widget Installation
+Add this single line to any webpage:
+```html
+<script src="https://hubermanchat.vercel.app/widget.js"></script>
+```
+
+### View Analytics
+Visit `/admin` to see conversation stats and get the embed code.
 
 ## Next Steps Required
 
