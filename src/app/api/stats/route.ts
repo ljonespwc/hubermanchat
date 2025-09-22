@@ -44,19 +44,8 @@ export async function GET() {
     const { data: recentSessions, error: sessionsError } = await supabase
       .from('conversation_sessions')
       .select(`
-        id,
-        session_id,
-        started_at,
-        ended_at,
-        total_questions,
-        matched_questions,
-        conversation_messages(
-          id,
-          question,
-          matched,
-          category,
-          created_at
-        )
+        *,
+        conversation_messages(*)
       `)
       .order('created_at', { ascending: false })
       .limit(10)
@@ -66,11 +55,14 @@ export async function GET() {
       console.error('Error fetching sessions:', sessionsError)
     }
 
-    // Transform the data to match expected format
-    const formattedSessions = recentSessions?.map(session => ({
-      ...session,
-      messages: session.conversation_messages || []
-    })) || []
+    // Transform the data to match expected format (rename conversation_messages to messages)
+    const formattedSessions = recentSessions?.map(session => {
+      const { conversation_messages, ...sessionData } = session
+      return {
+        ...sessionData,
+        messages: conversation_messages || []
+      }
+    }) || []
 
     return NextResponse.json({
       total: total || 0,
