@@ -182,16 +182,23 @@ async function generateNaturalDecline(userQuestion: string): Promise<NoMatchResp
   try {
     const systemPrompt = `You are a helpful assistant for the Huberman Lab podcast website.
 The user asked a question that doesn't match any of our FAQs.
-Generate a natural, friendly decline that:
-1. Acknowledges their specific question topic
-2. Explains we can only help with Huberman Lab podcast information
-3. Suggests relevant topics we CAN help with (podcast, premium membership, newsletter, events)
-4. Keeps it concise (2 sentences max)
-5. Sounds natural for voice/speech output`
+Generate a VERY BRIEF, natural decline that:
+1. Politely indicates you don't have that information
+2. Keep it to ONE short sentence
+3. Vary your responses - don't repeat the same decline pattern
+4. Don't list all topics you can help with - that's repetitive
+5. Sound natural for voice output
+
+Examples of good brief declines:
+- "I don't have information about that."
+- "That's outside what I can help with."
+- "I'm not able to answer that one."
+- "I don't have details on that topic."
+- "That's not something I can help with."`
 
     const userPrompt = `User asked: "${userQuestion}"
 
-Generate a natural decline response that sounds conversational.`
+Generate a brief, natural decline (one sentence).`
 
     const openai = getOpenAIClient()
     const completion = await openai.chat.completions.create({
@@ -200,12 +207,12 @@ Generate a natural decline response that sounds conversational.`
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      temperature: 0.4, // Some creativity for natural responses
-      max_tokens: 100
+      temperature: 0.7, // More variation to avoid repetition
+      max_tokens: 30 // Shorter limit for brief responses
     })
 
     const naturalResponse = completion.choices[0].message.content?.trim() ||
-      "I don't have specific information about that. Is there something else about Huberman Lab I can help you with?"
+      "I don't have information about that."
 
     return {
       type: 'no_match',
@@ -216,7 +223,7 @@ Generate a natural decline response that sounds conversational.`
     // Fallback to generic decline
     return {
       type: 'no_match',
-      response: "I don't have specific information about that. Is there something else about Huberman Lab I can help you with?"
+      response: "I don't have information about that."
     }
   }
 }

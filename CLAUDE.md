@@ -8,6 +8,8 @@ Building a voice-enabled AI assistant widget for the Huberman Lab website that h
 Always use this project_id when interacting with Supabase MCP tools.
 
 ## Recent Updates (Sept 22, 2025)
+
+### Morning Updates
 - **Admin Dashboard**: MVP analytics at `/admin` with embed code
 - **Widget Embed**: Simple one-line script installation
 - **Session-Based Tracking**: Conversations now grouped by user session
@@ -17,6 +19,19 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **Home Page Update**: Removed widget, added links to `/widget` and `/admin`
 - **URL Bug Fix**: Fixed Ph.D and abbreviations showing as URLs
 - **Blue Color Update**: Changed to #00AFEF throughout
+
+### Afternoon Updates
+- **Expanded FAQ Content**: Added 5 new FAQs about "Protocols" book and knowledge base for biographical questions
+  - Total FAQs: 40 (up from 35)
+  - New category: "Protocols Book" with release date, signed copies, languages, etc.
+  - Added `knowledge_base` section for contextual answers about Dr. Huberman
+- **Fixed Dashboard Data Issue**: Resolved Supabase nested select problem
+  - Changed from `conversation_messages(*)` join to separate queries
+  - Sessions and messages fetched independently then combined
+- **Dashboard UX Improvements**:
+  - Removed auto-refresh (was every 30 seconds)
+  - Sessions maintain user's expand/collapse state
+  - Dropped unused `conversations` table from database
 
 ## Current Status: ✅ Production Ready
 - **AI FAQ Matching**: GPT-4.1-mini handles all intent (95%+ accuracy, ~300ms)
