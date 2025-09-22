@@ -10,7 +10,11 @@ Always use this project_id when interacting with Supabase MCP tools.
 ## Recent Updates (Sept 22, 2025)
 - **Admin Dashboard**: MVP analytics at `/admin` with embed code
 - **Widget Embed**: Simple one-line script installation
-- **Conversation Tracking**: Automatic tracking to Supabase
+- **Session-Based Tracking**: Conversations now grouped by user session
+  - New tables: `conversation_sessions` and `conversation_messages`
+  - Dashboard shows expandable/collapsible session groups
+  - Tracks duration, total questions, and match rates per session
+- **Home Page Update**: Removed widget, added links to `/widget` and `/admin`
 - **URL Bug Fix**: Fixed Ph.D and abbreviations showing as URLs
 - **Blue Color Update**: Changed to #00AFEF throughout
 
@@ -34,7 +38,7 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Database**: Supabase (configured but not connected)
+- **Database**: Supabase (connected for analytics tracking)
 - **Voice**: Layercode (WebSocket + SSE streaming)
 - **AI**: OpenAI GPT-4.1-mini
 - **State Management**: React hooks + Zustand (installed)
@@ -48,7 +52,7 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **`/admin` Dashboard**: View stats, get embed code, see conversations
 - **`/widget` Embed**: Standalone page for iframe embedding
 - **`widget.js`**: One-line embed script for any website
-- **Supabase Analytics**: `conversations` table tracking all Q&A
+- **Supabase Analytics**: Session-based tracking with `conversation_sessions` and `conversation_messages` tables
 - **API Endpoints**: `/api/track` (fast tracking), `/api/stats` (dashboard data)
 
 ### 1. Data Layer
@@ -205,7 +209,6 @@ npx tsx scripts/test-ai-matcher.ts     # Test AI FAQ matching
 
 ## Known Limitations
 - Layercode requires webhook configuration in their dashboard
-- Supabase not connected yet (using local JSON file)
 - No authentication system (public access only)
 
 ## Resources

@@ -9,50 +9,64 @@ const supabase = createClient(
 
 export async function GET() {
   try {
-    // Get total conversations
+    // Get total sessions
     const { count: total } = await supabase
-      .from('conversations')
+      .from('conversation_sessions')
       .select('*', { count: 'exact', head: true })
 
-    // Get today's conversations
+    // Get today's sessions
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
     const { count: todayCount } = await supabase
-      .from('conversations')
+      .from('conversation_sessions')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', today.toISOString())
 
-    // Get match rate
-    const { data: matchData } = await supabase
-      .from('conversations')
+    // Get match rate from messages
+    const { data: messages } = await supabase
+      .from('conversation_messages')
       .select('matched')
 
-    const matchedCount = matchData?.filter(c => c.matched).length || 0
-    const totalWithData = matchData?.length || 1
-    const matchRate = Math.round((matchedCount / totalWithData) * 100)
+    const matchedCount = messages?.filter(m => m.matched).length || 0
+    const totalMessages = messages?.length || 1
+    const matchRate = Math.round((matchedCount / totalMessages) * 100)
 
-    // Get active now (last 5 minutes)
+    // Get active sessions (last 5 minutes)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
 
     const { count: activeNow } = await supabase
-      .from('conversations')
+      .from('conversation_sessions')
       .select('*', { count: 'exact', head: true })
-      .gte('created_at', fiveMinutesAgo.toISOString())
+      .gte('ended_at', fiveMinutesAgo.toISOString())
 
-    // Get recent conversations (last 20)
-    const { data: recentConversations } = await supabase
-      .from('conversations')
-      .select('id, question, matched, created_at')
+    // Get recent sessions with their messages (last 10 sessions)
+    const { data: recentSessions } = await supabase
+      .from('conversation_sessions')
+      .select(`
+        id,
+        session_id,
+        started_at,
+        ended_at,
+        total_questions,
+        matched_questions,
+        messages:conversation_messages(
+          id,
+          question,
+          matched,
+          category,
+          created_at
+        )
+      `)
       .order('created_at', { ascending: false })
-      .limit(20)
+      .limit(10)
 
     return NextResponse.json({
       total: total || 0,
       today: todayCount || 0,
       matchRate,
       activeNow: activeNow || 0,
-      recentConversations: recentConversations || []
+      recentSessions: recentSessions || []
     })
   } catch (error) {
     console.error('Stats error:', error)
@@ -61,7 +75,7 @@ export async function GET() {
       today: 0,
       matchRate: 0,
       activeNow: 0,
-      recentConversations: []
+      recentSessions: []
     })
   }
 }
