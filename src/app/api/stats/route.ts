@@ -41,7 +41,7 @@ export async function GET() {
       .gte('ended_at', fiveMinutesAgo.toISOString())
 
     // Get recent sessions with their messages (last 10 sessions)
-    const { data: recentSessions } = await supabase
+    const { data: recentSessions, error: sessionsError } = await supabase
       .from('conversation_sessions')
       .select(`
         id,
@@ -50,7 +50,7 @@ export async function GET() {
         ended_at,
         total_questions,
         matched_questions,
-        messages:conversation_messages(
+        conversation_messages(
           id,
           question,
           matched,
@@ -61,12 +61,23 @@ export async function GET() {
       .order('created_at', { ascending: false })
       .limit(10)
 
+    // Log any errors for debugging
+    if (sessionsError) {
+      console.error('Error fetching sessions:', sessionsError)
+    }
+
+    // Transform the data to match expected format
+    const formattedSessions = recentSessions?.map(session => ({
+      ...session,
+      messages: session.conversation_messages || []
+    })) || []
+
     return NextResponse.json({
       total: total || 0,
       today: todayCount || 0,
       matchRate,
       activeNow: activeNow || 0,
-      recentSessions: recentSessions || []
+      recentSessions: formattedSessions
     })
   } catch (error) {
     console.error('Stats error:', error)
