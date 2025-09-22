@@ -49,6 +49,16 @@ export async function matchFAQWithAI(userQuestion: string): Promise<FAQMatch | N
       }
     }
 
+    // Add knowledge base context if available
+    let knowledgeContext = ''
+    if ('knowledge_base' in faqData && faqData.knowledge_base) {
+      const kb = faqData.knowledge_base as Record<string, string>
+      knowledgeContext = '\n\nAdditional Context about Dr. Huberman:\n'
+      for (const [topic, content] of Object.entries(kb)) {
+        knowledgeContext += `${topic}: ${content}\n\n`
+      }
+    }
+
     // Create the prompt with all Q&A pairs
     const systemPrompt = `You are a helpful assistant that matches user questions to FAQs.
 You understand semantic meaning, intent, and can handle typos, rephrasing, and colloquial language.
@@ -61,7 +71,7 @@ Available FAQs:
 ${faqList.map(faq =>
   `${faq.num}. Q: ${faq.question}
    A: ${faq.answer}`
-).join('\n\n')}
+).join('\n\n')}${knowledgeContext}
 
 Instructions:
 - If there's a good match, provide your response in this exact format:
@@ -70,7 +80,11 @@ Instructions:
 - If there's a partial/uncertain match, use:
   PARTIAL:NUMBER
   NATURAL:Your natural version of the answer
-- If no relevant match exists, respond with just "none"
+- If the question is about Dr. Huberman's background, education, research, or achievements AND no specific FAQ matches:
+  Use the Additional Context to provide a comprehensive answer with format:
+  CONTEXT
+  NATURAL:Your natural answer based on the context (2-3 sentences max)
+- If no relevant match exists and it's not about Dr. Huberman, respond with just "none"
 - Consider intent and meaning, not just exact words
 - Make the natural answer sound friendly and conversational for voice output
 - Keep core facts accurate but rephrase for natural speech`
@@ -103,6 +117,23 @@ Instructions:
     let matchNum: number
     let confidence: 'high' | 'medium' | 'low' = 'high'
     let naturalAnswer = ''
+
+    // Check if it's a context-based response (for biographical questions)
+    if (matchLine === 'CONTEXT') {
+      // Extract natural answer from context response
+      if (naturalLine.toUpperCase().startsWith('NATURAL:')) {
+        naturalAnswer = naturalLine.replace(/^NATURAL:/i, '').trim()
+      }
+
+      // Return as a special biographical response
+      return {
+        question: userQuestion,
+        answer: naturalAnswer,
+        naturalAnswer: naturalAnswer,
+        category: 'About Dr. Huberman',
+        confidence: 'high'
+      }
+    }
 
     // Extract match number and natural answer
     if (matchLine.startsWith('MATCH:')) {

@@ -192,8 +192,39 @@
           "answer": "Our current podcast sponsors are AG1, BetterHelp, Carbon, David, Eight Sleep, Function Health, Helix, Joovv, Levels, LMNT, Mateína, Maui Nui Venison, Our Place, ROKA, Waking Up, Wealthfront, and WHOOP."
         }
       ]
+    },
+    {
+      "name": "Protocols Book",
+      "questions": [
+        {
+          "question": "When will Protocols be released?",
+          "answer": "Protocols is set to be released September 15, 2026. If there are any changes to the release date, the retailer you purchased from will notify you."
+        },
+        {
+          "question": "Are signed copies of Protocols available?",
+          "answer": "Yes, signed copies are available in limited quantities through Barnes & Noble."
+        },
+        {
+          "question": "Will Protocols be available in languages other than English?",
+          "answer": "Yes, Protocols will be available in many languages including Brazilian Portuguese, Catalan, Complex Chinese (Taiwan), Simplified Chinese (China), Croatian, Czech, Danish, Dutch, Estonian, French, French Canadian, German, Greek, Hebrew, Hungarian, Italian, Japanese, Korean, Latvian, Lithuanian, Polish, Portuguese, Romanian, Slovak, Spanish, Swedish, Turkish, and Ukrainian."
+        },
+        {
+          "question": "What is Protocols about?",
+          "answer": "Protocols: An Operating Manual for the Human Body is an essential guide to improving brain function, enhancing mood and energy, optimizing bodily health and physical performance, and rewiring your nervous system to learn new skills and behaviors that can transform your life. It provides simple, powerful, and evidence-based solutions to life's most common challenges."
+        },
+        {
+          "question": "Where can I buy Protocols?",
+          "answer": "Protocols is available for pre-order at Amazon, Barnes & Noble, Audible, Apple Books, Bookshop.org, Spotify, BAM!, Simon & Schuster, and other major retailers. International editions are available through local retailers in many countries."
+        }
+      ]
     }
   ],
+  "knowledge_base": {
+    "about_huberman": "Andrew Huberman, Ph.D., is a neuroscientist and tenured professor in the Departments of Neurobiology and Ophthalmology at Stanford University School of Medicine. He earned his bachelor's degree with honors from UC Santa Barbara (1998), master's from UC Berkeley (2000), and Ph.D. in neuroscience from UC Davis (2004). He conducted postdoctoral research at Stanford from 2005-2010. His research laboratory, the Huberman Lab, has made significant contributions to understanding brain development, visual perception, neural mechanisms of stress and resilience, and neural plasticity. He has published over 75 peer-reviewed articles in top journals including Nature, Science, Cell, and Neuron. In 2021, Dr. Huberman launched the Huberman Lab podcast, which quickly became and remains the #1 health and science podcast in the world. He is the co-founder of Scicomm Media and author of the upcoming book 'Protocols: An Operating Manual for the Human Body.'",
+    "research_achievements": "Dr. Huberman's research accomplishments have earned him numerous prestigious honors including the Cogan Award (2017) for contributions to vision science and ophthalmology, the McKnight Neuroscience Scholar Award (2013), and the Pew Biomedical Scholar Award (2013). He received the Allan G. Marr Prize for the Best Ph.D. Dissertation and the Helen Hay Whitney Postdoctoral Fellowship. His laboratory uses techniques including optogenetics, viral tracing, electrophysiology, and virtual reality to understand how neural circuits control complex behaviors.",
+    "teaching_mentorship": "Dr. Huberman has taught undergraduate and graduate courses in neuroscience, neuroanatomy, and developmental neurobiology at both UCSD and Stanford. He has served as Course Director for Neuroanatomy for Stanford medical students and has mentored dozens of undergrads, Ph.D. students, and postdoctoral fellows, many of whom now hold successful careers as professors in academia, directors in biotech, or practicing M.D.s.",
+    "scicomm_media": "Dr. Huberman is the co-founder of Scicomm Media, the parent company of both Huberman Lab and Perform with Dr. Andy Galpin. Through Scicomm Media and the Huberman Lab podcast, he translates science and science-based tools into actionable protocols for improving brain function, enhancing mood and energy, optimizing physical health and performance, and developing new skills and behaviors."
+  },
   "additional_resources": {
     "contact": "Need more help? Get in touch.",
     "popular_topics": [
