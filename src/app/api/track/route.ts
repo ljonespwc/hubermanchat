@@ -19,7 +19,8 @@ export async function POST(request: Request) {
         session_id: sessionId,
         question: body.question || '',
         matched: body.matched || false,
-        category: body.category || null
+        category: body.category || null,
+        page_url: body.page_url || null
       })
 
     if (messageError) {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     // Only update session counts if message was inserted successfully
     const { data: session, error: sessionError } = await supabase
       .from('conversation_sessions')
-      .select('id, total_questions, matched_questions')
+      .select('id, total_questions, matched_questions, page_url')
       .eq('session_id', sessionId)
       .single()
 
@@ -42,17 +43,25 @@ export async function POST(request: Request) {
         .insert({
           session_id: sessionId,
           total_questions: 1,
-          matched_questions: body.matched ? 1 : 0
+          matched_questions: body.matched ? 1 : 0,
+          page_url: body.page_url || null
         })
     } else {
-      // Update existing session counts
+      // Update existing session counts and optionally set page URL if not set
+      const updateData: any = {
+        total_questions: (session.total_questions || 0) + 1,
+        matched_questions: (session.matched_questions || 0) + (body.matched ? 1 : 0),
+        ended_at: new Date().toISOString()
+      }
+
+      // Only set page_url if it's not already set in the session
+      if (!session.page_url && body.page_url) {
+        updateData.page_url = body.page_url
+      }
+
       await supabase
         .from('conversation_sessions')
-        .update({
-          total_questions: (session.total_questions || 0) + 1,
-          matched_questions: (session.matched_questions || 0) + (body.matched ? 1 : 0),
-          ended_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('session_id', sessionId)
     }
 

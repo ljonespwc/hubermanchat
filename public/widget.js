@@ -82,13 +82,14 @@
     }
 
     if (e.data.type === 'track') {
-      // Forward tracking events with session ID
+      // Forward tracking events with session ID and page URL
       fetch('https://hubermanchat.vercel.app/api/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...e.data.payload,
-          session_id: sessionId
+          session_id: sessionId,
+          page_url: window.location.href
         })
       }).catch(() => {
         // Ignore tracking errors

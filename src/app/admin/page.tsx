@@ -19,6 +19,7 @@ interface ConversationSession {
   ended_at: string | null
   total_questions: number
   matched_questions: number
+  page_url: string | null
   messages: ConversationMessage[]
 }
 
@@ -192,6 +193,15 @@ export default function AdminDashboard() {
                             {duration > 0 && ` • ${duration}s duration`}
                             {' • '}
                             {session.matched_questions}/{session.total_questions} matched
+                            {session.page_url && (
+                              <>
+                                <br />
+                                <span className="text-gray-400">
+                                  {session.page_url.replace(/^https?:\/\//, '').substring(0, 50)}
+                                  {session.page_url.length > 50 && '...'}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
