@@ -234,4 +234,4 @@ npx tsx scripts/test-ai-matcher.ts     # Test AI FAQ matching
 - Supabase Docs: https://supabase.com/docs
 
 ## Contact
-For questions about implementation, check this file first or review the README.md.
+For questions about implementation, check this file first or review the README.md.# Force redeploy Mon Sep 22 13:55:58 CEST 2025
