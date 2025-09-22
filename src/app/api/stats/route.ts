@@ -40,13 +40,10 @@ export async function GET() {
       .select('*', { count: 'exact', head: true })
       .gte('ended_at', fiveMinutesAgo.toISOString())
 
-    // Get recent sessions with their messages (last 10 sessions)
+    // Get recent sessions (last 10 sessions)
     const { data: recentSessions, error: sessionsError } = await supabase
       .from('conversation_sessions')
-      .select(`
-        *,
-        conversation_messages(*)
-      `)
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(10)
 
@@ -55,14 +52,28 @@ export async function GET() {
       console.error('Error fetching sessions:', sessionsError)
     }
 
-    // Transform the data to match expected format (rename conversation_messages to messages)
-    const formattedSessions = recentSessions?.map(session => {
-      const { conversation_messages, ...sessionData } = session
-      return {
-        ...sessionData,
-        messages: conversation_messages || []
+    // Get messages for these sessions
+    const sessionIds = recentSessions?.map(s => s.session_id) || []
+    const { data: allMessages } = await supabase
+      .from('conversation_messages')
+      .select('*')
+      .in('session_id', sessionIds)
+      .order('created_at', { ascending: true })
+
+    // Group messages by session_id
+    const messagesBySession = (allMessages || []).reduce((acc, msg) => {
+      if (!acc[msg.session_id]) {
+        acc[msg.session_id] = []
       }
-    }) || []
+      acc[msg.session_id].push(msg)
+      return acc
+    }, {} as Record<string, any[]>)
+
+    // Combine sessions with their messages
+    const formattedSessions = recentSessions?.map(session => ({
+      ...session,
+      messages: messagesBySession[session.session_id] || []
+    })) || []
 
     return NextResponse.json({
       total: total || 0,
