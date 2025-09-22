@@ -11,7 +11,7 @@ const config: Config = {
       colors: {
         huberman: {
           primary: '#1e293b',
-          secondary: '#3b82f6',
+          secondary: '#00AFEF',
           accent: '#f59e0b',
           dark: '#0f172a',
           light: '#f1f5f9',
