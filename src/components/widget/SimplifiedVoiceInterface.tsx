@@ -114,10 +114,10 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
   }, [isConnected])
 
   return (
-    <div className="relative p-8 space-y-6 min-h-[320px]">
+    <div className="relative p-6 space-y-4">
 
       {/* Main Interface */}
-      <div className="flex flex-col items-center space-y-6">
+      <div className="flex flex-col items-center space-y-4">
         {/* Voice Button */}
         <motion.button
           onClick={() => {
@@ -177,7 +177,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
         </motion.button>
 
         {/* Status Text - Fixed height container */}
-        <div className="h-6 flex items-center justify-center">
+        <div className="h-5 flex items-center justify-center">
           <motion.p
             className="text-sm text-gray-600 dark:text-gray-400 text-center"
             key={getStatusText()}
@@ -190,7 +190,7 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
         </div>
 
         {/* URL Display Area */}
-        <div className="min-h-[40px] flex items-center justify-center">
+        <div className="min-h-[32px] flex items-center justify-center">
           <AnimatePresence>
             {showURLs && currentURLs?.hasLinks && (
               <motion.div
