@@ -16,6 +16,11 @@ Always use this project_id when interacting with Supabase MCP tools.
   - Blue pulse/ring for AI speaking (no bars)
   - Modal header: WiFi (left), title (center), X (right)
 - **Welcome**: Mentions covered topics (podcast, premium, newsletter, events)
+- **URL Display**: Shows clickable links below voice animation
+  - Full URLs displayed (not abbreviated)
+  - Actual URLs for all FAQ references (scraped from hubermanlab.com/faq)
+  - Links appear during AI response, fade out 3 seconds after
+- **Optimized spacing**: Reduced dead space for better visual balance
 - Build passing, ready for deployment
 
 ## Tech Stack
@@ -55,6 +60,7 @@ Always use this project_id when interacting with Supabase MCP tools.
 - **faq-matcher.ts**: Legacy keyword matching (emergency fallback)
 - **openai.ts**: GPT-4 integration utilities
 - **supabase.ts**: Database client and types (ready to connect)
+- **url-extractor.ts**: Extracts and maps URLs from FAQ answers (with full paths)
 
 ### 5. Custom Hooks (`/src/hooks/`)
 - **useSimpleLayercodeVoice.ts**: Simplified Layercode integration with automatic VAD
@@ -71,7 +77,8 @@ Always use this project_id when interacting with Supabase MCP tools.
 6. If match found: returns FAQ answer directly
 7. If no match: polite decline with invitation to ask another question
 8. Answer is spoken via Layercode TTS
-9. User can continue conversation naturally (no button clicks needed)
+9. Relevant URLs display below voice animation (if answer contains links)
+10. User can continue conversation naturally (no button clicks needed)
 
 ## Next Steps Required
 
@@ -159,7 +166,7 @@ npx tsx scripts/test-ai-matcher.ts     # Test AI FAQ matching
 ### Architecture
 - **Frontend**: React SDK with WebSocket for real-time audio streaming
 - **Backend**: Node.js SDK with SSE for streaming AI responses
-- **Pipeline**: Voice → Layercode → Webhook → OpenAI → SSE → TTS → WebSocket → User
+- **Pipeline**: Browser → Layercode (STT) → Webhook → GPT-4.1-mini → Layercode (TTS) → Browser
 
 ### Key Layercode Documentation
 - **React SDK**: https://docs.layercode.com/sdk-reference/react_sdk

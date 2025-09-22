@@ -65,8 +65,8 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
 
   vagueReferences.forEach(({ pattern, url }) => {
     if (pattern.test(answer)) {
-      // Extract the domain name for display text
-      const displayText = url.replace(/^https?:\/\//, '').split('/')[0]
+      // Use the full URL without https:// for display
+      const displayText = url.replace(/^https?:\/\//, '')
 
       // Check if we haven't already added this URL
       if (!links.some(link => link.href === url)) {

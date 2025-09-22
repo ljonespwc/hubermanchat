@@ -201,16 +201,16 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                 className="space-y-1 text-center"
               >
                 {currentURLs.links.map((link, index) => (
-                  <div key={index} className="text-xs text-gray-500 dark:text-gray-400">
+                  <div key={index} className="text-xs text-gray-500 dark:text-gray-400 max-w-full px-4">
                     {link.type === 'url' ? (
                       <a
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 hover:text-huberman-secondary transition-colors underline"
+                        className="inline-flex items-center gap-1 hover:text-huberman-secondary transition-colors underline break-all"
                       >
                         {link.text}
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
                       </a>
                     ) : (
                       <span className="text-gray-400 italic">
