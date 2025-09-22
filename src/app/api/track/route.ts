@@ -12,45 +12,8 @@ export async function POST(request: Request) {
     const body = await request.json()
     const sessionId = body.session_id || 'unknown'
 
-    // Check if session exists, if not create it (fire and forget)
-    supabase
-      .from('conversation_sessions')
-      .select('id')
-      .eq('session_id', sessionId)
-      .single()
-      .then(async ({ data: session, error }) => {
-        if (error || !session) {
-          // Create new session
-          await supabase
-            .from('conversation_sessions')
-            .insert({
-              session_id: sessionId,
-              total_questions: 1,
-              matched_questions: body.matched ? 1 : 0
-            })
-        } else {
-          // Update existing session counts
-          const { data: current } = await supabase
-            .from('conversation_sessions')
-            .select('total_questions, matched_questions')
-            .eq('session_id', sessionId)
-            .single()
-
-          if (current) {
-            await supabase
-              .from('conversation_sessions')
-              .update({
-                total_questions: (current.total_questions || 0) + 1,
-                matched_questions: (current.matched_questions || 0) + (body.matched ? 1 : 0),
-                ended_at: new Date().toISOString()
-              })
-              .eq('session_id', sessionId)
-          }
-        }
-      })
-
-    // Insert the message
-    supabase
+    // Insert the message first
+    const { error: messageError } = await supabase
       .from('conversation_messages')
       .insert({
         session_id: sessionId,
@@ -58,13 +21,41 @@ export async function POST(request: Request) {
         matched: body.matched || false,
         category: body.category || null
       })
-      .then(({ error }) => {
-        if (error) {
-          console.error('Track message error:', error)
-        }
-      })
 
-    // Return immediately for speed
+    if (messageError) {
+      console.error('Track message error:', messageError)
+      // Don't update counters if message insert failed
+      return NextResponse.json({ success: false, error: 'Message insert failed' })
+    }
+
+    // Only update session counts if message was inserted successfully
+    const { data: session, error: sessionError } = await supabase
+      .from('conversation_sessions')
+      .select('id, total_questions, matched_questions')
+      .eq('session_id', sessionId)
+      .single()
+
+    if (sessionError || !session) {
+      // Create new session
+      await supabase
+        .from('conversation_sessions')
+        .insert({
+          session_id: sessionId,
+          total_questions: 1,
+          matched_questions: body.matched ? 1 : 0
+        })
+    } else {
+      // Update existing session counts
+      await supabase
+        .from('conversation_sessions')
+        .update({
+          total_questions: (session.total_questions || 0) + 1,
+          matched_questions: (session.matched_questions || 0) + (body.matched ? 1 : 0),
+          ended_at: new Date().toISOString()
+        })
+        .eq('session_id', sessionId)
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     // Don't let tracking errors affect the widget
