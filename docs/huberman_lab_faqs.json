@@ -42,7 +42,7 @@
       "questions": [
         {
           "question": "Can I suggest guests for the Huberman Lab podcast?",
-          "answer": "We don't accept inbound pitches, but you're welcome to share guest suggestions using this form. Please do not email guest suggestions."
+          "answer": "We don't accept inbound pitches, but you're welcome to share guest suggestions using this form: https://airtable.com/app3khvqyh3rdqa5g/pagmOcc3BAw8FIxDO/form. Please do not email guest suggestions."
         }
       ]
     },
@@ -68,11 +68,11 @@
         },
         {
           "question": "Can I invite Andrew Huberman to speak at my conference or event?",
-          "answer": "For all speaking requests, please submit your details through this form."
+          "answer": "For all speaking requests, please submit your details through this form: https://airtable.com/appzMBzeGsDceqhoE/paglHM1ukVBcpOrGd/form"
         },
         {
           "question": "Can I invite Dr Huberman on my podcast?",
-          "answer": "Yes. Please complete this form."
+          "answer": "Yes. Please complete this form: https://airtable.com/appDg88FrbCxePxpG/pagsREmsmZogaB9VQ/form"
         }
       ]
     },
@@ -185,7 +185,7 @@
         },
         {
           "question": "Are you accepting new podcast sponsors?",
-          "answer": "Not at this time. However, if you're interested in sponsoring Huberman Lab, please complete this form."
+          "answer": "Not at this time. However, if you're interested in sponsoring Huberman Lab, please complete this form: https://airtable.com/app9yIGPaaYyDlhxz/pagIHDejSMThpcqSN/form"
         },
         {
           "question": "Who are your current podcast sponsors?",

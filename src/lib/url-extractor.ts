@@ -42,9 +42,26 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
       const cleanUrl = cleanMatch.startsWith('http') ? cleanMatch :
                       cleanMatch.startsWith('www.') ? `https://${cleanMatch}` :
                       `https://${cleanMatch}`
+
+      // For Airtable forms, show cleaner display text
+      let displayText = cleanMatch
+      if (cleanUrl.includes('airtable.com')) {
+        if (cleanUrl.includes('guest')) {
+          displayText = 'Guest Suggestion Form'
+        } else if (cleanUrl.includes('sponsor')) {
+          displayText = 'Sponsorship Form'
+        } else if (cleanUrl.includes('speaking') || cleanUrl.includes('appzMBzeGsDceqhoE')) {
+          displayText = 'Speaking Request Form'
+        } else if (cleanUrl.includes('podcast') || cleanUrl.includes('appDg88FrbCxePxpG')) {
+          displayText = 'Podcast Invitation Form'
+        } else {
+          displayText = 'Submission Form'
+        }
+      }
+
       links.push({
         type: 'url',
-        text: cleanMatch,
+        text: displayText,
         href: cleanUrl
       })
     })
@@ -52,14 +69,6 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
 
   // Check for vague link references and provide actual URLs
   const vagueReferences = [
-    // Guest suggestions form
-    { pattern: /share guest suggestions using this form/i, url: 'https://airtable.com/app3khvqyh3rdqa5g/pagmOcc3BAw8FIxDO/form' },
-    // Speaking requests form
-    { pattern: /submit your details through this form/i, url: 'https://airtable.com/appzMBzeGsDceqhoE/paglHM1ukVBcpOrGd/form' },
-    // Podcast invitation form
-    { pattern: /complete this form.*podcast/i, url: 'https://airtable.com/appDg88FrbCxePxpG/pagsREmsmZogaB9VQ/form' },
-    // Sponsor interest form
-    { pattern: /complete this form.*sponsor/i, url: 'https://airtable.com/app9yIGPaaYyDlhxz/pagIHDejSMThpcqSN/form' },
     // Newsletter signup
     { pattern: /join the Neural Network newsletter/i, url: 'https://www.hubermanlab.com/newsletter' },
     // Email list for events
