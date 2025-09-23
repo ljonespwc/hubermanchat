@@ -10,6 +10,15 @@ Always use this project_id when interacting with Supabase MCP tools.
 ## IMPORTANT: FAQ Data Management
 **DO NOT MODIFY** the `/docs/huberman_lab_faqs.json` file without explicit user request. This file contains carefully curated FAQ content including specific Airtable form URLs that were manually added. Only make changes to this file when specifically instructed by the user, and only modify exactly what is requested.
 
+## Recent Updates (Sept 23, 2025)
+
+### Latest Updates
+- **Fixed Database Tracking**: Resolved foreign key constraint issue - sessions must be created before messages
+- **Airtable Form URLs Added**: All form references now have actual clickable Airtable URLs
+- **Clean URL Display**: Airtable forms show as friendly names (e.g., "Guest Suggestion Form") instead of long URLs
+- **Dashboard Caching Fixed**: Added cache-control headers to `/api/stats` for real-time data display
+- **Vercel CLI Deployed**: Manual deployment capability added as backup to GitHub integration
+
 ## Recent Updates (Sept 22, 2025)
 
 ### Morning Updates
