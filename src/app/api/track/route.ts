@@ -65,8 +65,8 @@ export async function POST(request: Request) {
         session_id: sessionId,
         question: body.question || '',
         matched: body.matched || false,
-        category: body.category || null,
-        page_url: body.page_url || null
+        category: body.category || null
+        // page_url removed - stored only in session table
       })
 
     if (messageError) {

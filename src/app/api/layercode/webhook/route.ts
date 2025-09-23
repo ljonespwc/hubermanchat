@@ -132,14 +132,17 @@ export async function POST(request: Request) {
           const result = await matchFAQWithAI(text, conversationMessages[conversationKey])
 
           // Track conversation (fire and forget for speed)
-          fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://hubermanchat.vercel.app'}/api/track`, {
+          // For direct /widget testing, use the widget URL as page_url
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hubermanchat.vercel.app'
+          fetch(`${appUrl}/api/track`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               session_id: session_id || conversation_id || 'unknown',
               question: text,
               matched: result ? !('type' in result && result.type === 'no_match') : false,
-              category: result && 'category' in result ? result.category : null
+              category: result && 'category' in result ? result.category : null,
+              page_url: `${appUrl}/widget` // Default to widget page for direct testing
             })
           }).catch(() => {}) // Ignore tracking errors
 
