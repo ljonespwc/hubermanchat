@@ -37,7 +37,6 @@ export function useLayercodeVoice(options: UseSimpleLayercodeVoiceOptions = {}) 
       console.error('Layercode error:', error)
     },
     onDataMessage: (data) => {
-      console.log('[Layercode Data Message]:', data)
       // Pass through to parent component if handler provided
       if (options.onDataMessage) {
         options.onDataMessage(data)

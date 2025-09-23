@@ -29,10 +29,8 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
       timestamp: new Date().toISOString()
     },
     onDataMessage: (data) => {
-      console.log('[VoiceInterface Data]:', data)
       // The data comes wrapped in {type: 'response.data', content: {...}}
       if (data?.type === 'response.data' && data.content?.urls) {
-        console.log('[URL Data Found]:', data.content.urls)
         const urlData = data.content.urls
         if (urlData?.hasLinks) {
           setCurrentURLs(urlData)
@@ -40,7 +38,6 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
         }
       } else if (data?.urls) {
         // Try direct access in case structure is different
-        console.log('[Direct URL Data]:', data.urls)
         if (data.urls.hasLinks) {
           setCurrentURLs(data.urls)
           setShowURLs(true)

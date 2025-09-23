@@ -175,11 +175,9 @@ export async function POST(request: Request) {
 
               // Extract URLs from the original answer
               const urlData = extractURLsFromAnswer(faqMatch.answer)
-              console.log('[Webhook] Extracted URLs from answer:', faqMatch.answer.substring(0, 100))
-              console.log('[Webhook] URL Data:', urlData)
 
               // Send metadata about the FAQ match with URL data
-              const dataPayload = {
+              stream.data({
                 type: 'faq_match',
                 question: faqMatch.question,
                 answer: finalResponse,
@@ -187,9 +185,7 @@ export async function POST(request: Request) {
                 confidence: faqMatch.confidence,
                 category: faqMatch.category,
                 urls: urlData
-              }
-              console.log('[Webhook] Sending data payload with URLs:', dataPayload.urls)
-              stream.data(dataPayload)
+              })
             }
           } else {
             // Fallback if something went wrong
