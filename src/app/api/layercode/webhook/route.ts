@@ -91,19 +91,8 @@ export async function POST(request: Request) {
             ]
           }
 
-          // Store user message immediately
-          conversationMessages[conversationKey].push({
-            role: 'user',
-            content: text,
-            turn_id
-          })
-
-          // Debug: Log conversation history
-          console.log(`Conversation ${conversationKey} history:`,
-            conversationMessages[conversationKey].map(m => `${m.role}: ${m.content.substring(0, 50)}...`)
-          )
-
-          // Handle interruption context if present
+          // Handle interruption context BEFORE storing the new user message
+          // This ensures we update any interrupted message (including welcome) first
           if (interruption_context?.previous_turn_interrupted) {
             console.log('Handling interruption:', interruption_context)
 
@@ -116,8 +105,32 @@ export async function POST(request: Request) {
               // Update with what was actually heard
               interruptedMsg.content = interruption_context.text_heard
               console.log(`Updated interrupted message: ${interruption_context.text_heard.substring(0, 50)}...`)
+            } else {
+              // If we can't find the message (e.g., it was the welcome), add it
+              console.log('Interrupted message not found, likely welcome message')
+              // Check if last message is assistant, if not add the interrupted content
+              const lastMsg = conversationMessages[conversationKey][conversationMessages[conversationKey].length - 1]
+              if (!lastMsg || lastMsg.role !== 'assistant') {
+                conversationMessages[conversationKey].push({
+                  role: 'assistant',
+                  content: interruption_context.text_heard,
+                  turn_id: interruption_context.assistant_turn_id
+                })
+              }
             }
           }
+
+          // Store user message after handling interruption
+          conversationMessages[conversationKey].push({
+            role: 'user',
+            content: text,
+            turn_id
+          })
+
+          // Debug: Log conversation history
+          console.log(`Conversation ${conversationKey} history:`,
+            conversationMessages[conversationKey].map(m => `${m.role}: ${m.content.substring(0, 50)}...`)
+          )
 
           // Create placeholder for assistant response
           const assistantPlaceholderIndex = conversationMessages[conversationKey].length

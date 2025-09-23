@@ -33,6 +33,23 @@ Always use this project_id when interacting with Supabase MCP tools.
   - Sessions maintain user's expand/collapse state
   - Dropped unused `conversations` table from database
 
+### Evening Updates
+- **Conversation History**: Implemented full conversation context tracking
+  - Webhook handler stores messages with turn_id tracking
+  - FAQ matcher now uses conversation history for context-aware responses
+  - Enables follow-up questions like "tell me more" or "what about that?"
+- **Interruption Handling**: Added support for user interruptions
+  - Layercode's interruption_context properly updates partial responses
+  - Maintains conversation coherence when user interrupts mid-answer
+- **Page URL Tracking**: Added visitor source tracking
+  - Stores page_url in database for each session and message
+  - Dashboard displays which page visitors were on when asking questions
+  - Widget.js captures window.location.href automatically
+- **Data Fixes**:
+  - Fixed tracking endpoint to be atomic (prevents count mismatches)
+  - Removed periods after "Dr" in FAQ JSON (prevents false URL detection)
+  - Corrected existing session/message count discrepancies in database
+
 ## Current Status: ✅ Production Ready
 - **AI FAQ Matching**: GPT-4.1-mini handles all intent (95%+ accuracy, ~300ms)
   - Generates natural conversational responses
