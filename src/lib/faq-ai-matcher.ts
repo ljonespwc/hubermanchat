@@ -31,7 +31,10 @@ export interface NoMatchResponse {
  * Sends all FAQs to GPT-4.1-mini for intent matching
  * Returns either a match or a natural decline response
  */
-export async function matchFAQWithAI(userQuestion: string): Promise<FAQMatch | NoMatchResponse | null> {
+export async function matchFAQWithAI(
+  userQuestion: string,
+  conversationHistory?: Array<{ role: string; content: string }>
+): Promise<FAQMatch | NoMatchResponse | null> {
   try {
     // Prepare all FAQs in a numbered list
     const faqList: Array<{ num: number; question: string; answer: string; category: string }> = []
@@ -62,10 +65,25 @@ export async function matchFAQWithAI(userQuestion: string): Promise<FAQMatch | N
     // Create the prompt with all Q&A pairs
     const systemPrompt = `You are a helpful assistant that matches user questions to FAQs.
 You understand semantic meaning, intent, and can handle typos, rephrasing, and colloquial language.
-Be generous in matching - if the user is clearly asking about a topic covered in the FAQs, match it.`
+Be generous in matching - if the user is clearly asking about a topic covered in the FAQs, match it.
+Consider the conversation context when interpreting questions like "tell me more" or "what about X".`
+
+    // Build context string if history is provided
+    let contextString = ''
+    if (conversationHistory && conversationHistory.length > 0) {
+      // Get last few exchanges for context (skip system messages)
+      const recentHistory = conversationHistory
+        .filter(m => m.role !== 'system')
+        .slice(-4) // Last 2 exchanges
+
+      if (recentHistory.length > 0) {
+        contextString = '\nRecent conversation:\n' +
+          recentHistory.map(m => `${m.role}: ${m.content}`).join('\n') + '\n\n'
+      }
+    }
 
     const userPrompt = `Find the best matching FAQ for this user question.
-User asks: "${userQuestion}"
+${contextString}Current user asks: "${userQuestion}"
 
 Available FAQs:
 ${faqList.map(faq =>
@@ -106,7 +124,7 @@ Instructions:
     // Parse the response
     if (response.toLowerCase() === 'none') {
       // Generate a natural decline message
-      return await generateNaturalDecline(userQuestion)
+      return await generateNaturalDecline(userQuestion, conversationHistory)
     }
 
     // Parse the structured response
@@ -178,7 +196,10 @@ Instructions:
 /**
  * Generate a natural decline message when no FAQ matches
  */
-async function generateNaturalDecline(userQuestion: string): Promise<NoMatchResponse> {
+async function generateNaturalDecline(
+  userQuestion: string,
+  conversationHistory?: Array<{ role: string; content: string }>
+): Promise<NoMatchResponse> {
   try {
     const systemPrompt = `You are a helpful assistant for the Huberman Lab podcast website.
 The user asked a question that doesn't match any of our FAQs.
@@ -188,15 +209,29 @@ Generate a VERY BRIEF, natural decline that:
 3. Vary your responses - don't repeat the same decline pattern
 4. Don't list all topics you can help with - that's repetitive
 5. Sound natural for voice output
+6. If there's conversation context, acknowledge it subtly
 
 Examples of good brief declines:
 - "I don't have information about that."
 - "That's outside what I can help with."
 - "I'm not able to answer that one."
 - "I don't have details on that topic."
-- "That's not something I can help with."`
+- "That's not something I can help with."
+- "I don't have more information on that aspect."
+- "That specific detail isn't in my FAQs."`
 
-    const userPrompt = `User asked: "${userQuestion}"
+    // Build context if available
+    let contextString = ''
+    if (conversationHistory && conversationHistory.length > 2) {
+      const lastExchange = conversationHistory
+        .filter(m => m.role !== 'system')
+        .slice(-2)
+      if (lastExchange.length > 0) {
+        contextString = '\nContext: User has been asking about related topics.\n'
+      }
+    }
+
+    const userPrompt = `${contextString}User asked: "${userQuestion}"
 
 Generate a brief, natural decline (one sentence).`
 
