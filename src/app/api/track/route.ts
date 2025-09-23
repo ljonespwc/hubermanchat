@@ -12,24 +12,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const sessionId = body.session_id || 'unknown'
 
-    // Insert the message first
-    const { error: messageError } = await supabase
-      .from('conversation_messages')
-      .insert({
-        session_id: sessionId,
-        question: body.question || '',
-        matched: body.matched || false,
-        category: body.category || null,
-        page_url: body.page_url || null
-      })
-
-    if (messageError) {
-      console.error('Track message error:', messageError)
-      // Don't update counters if message insert failed
-      return NextResponse.json({ success: false, error: 'Message insert failed' })
-    }
-
-    // Only update session counts if message was inserted successfully
+    // First, ensure the session exists
     const { data: session, error: sessionError } = await supabase
       .from('conversation_sessions')
       .select('id, total_questions, matched_questions, page_url')
@@ -37,8 +20,8 @@ export async function POST(request: Request) {
       .single()
 
     if (sessionError || !session) {
-      // Create new session
-      await supabase
+      // Create new session first (required before we can insert messages due to foreign key constraint)
+      const { error: createError } = await supabase
         .from('conversation_sessions')
         .insert({
           session_id: sessionId,
@@ -46,6 +29,11 @@ export async function POST(request: Request) {
           matched_questions: body.matched ? 1 : 0,
           page_url: body.page_url || null
         })
+
+      if (createError) {
+        console.error('Create session error:', createError)
+        return NextResponse.json({ success: false, error: 'Session creation failed' })
+      }
     } else {
       // Update existing session counts and optionally set page URL if not set
       const updateData: any = {
@@ -59,10 +47,32 @@ export async function POST(request: Request) {
         updateData.page_url = body.page_url
       }
 
-      await supabase
+      const { error: updateError } = await supabase
         .from('conversation_sessions')
         .update(updateData)
         .eq('session_id', sessionId)
+
+      if (updateError) {
+        console.error('Update session error:', updateError)
+        return NextResponse.json({ success: false, error: 'Session update failed' })
+      }
+    }
+
+    // Now insert the message (session exists so foreign key constraint is satisfied)
+    const { error: messageError } = await supabase
+      .from('conversation_messages')
+      .insert({
+        session_id: sessionId,
+        question: body.question || '',
+        matched: body.matched || false,
+        category: body.category || null,
+        page_url: body.page_url || null
+      })
+
+    if (messageError) {
+      console.error('Track message error:', messageError)
+      // Message insert failed but session was already updated - not ideal but better than nothing
+      return NextResponse.json({ success: false, error: 'Message insert failed' })
     }
 
     return NextResponse.json({ success: true })
