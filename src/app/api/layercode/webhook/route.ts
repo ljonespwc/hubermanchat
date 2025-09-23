@@ -60,11 +60,14 @@ export async function POST(request: Request) {
           const welcomeMsg = "Hello! I'm your Huberman Lab assistant. I can help with questions about the podcast, Dr. Huberman's book Protocols, premium membership, newsletter, events, and more. How can I help you today?"
           stream.tts(welcomeMsg)
 
+          // Store with a special marker for the welcome message
           conversationMessages[conversationKey].push({
             role: 'assistant',
             content: welcomeMsg,
-            turn_id
+            turn_id: turn_id || 'welcome'  // Use 'welcome' as fallback identifier
           })
+
+          console.log(`Session start - turn_id: ${turn_id}, conversation: ${conversationKey}`)
 
           stream.end()
           return
@@ -94,29 +97,40 @@ export async function POST(request: Request) {
           // Handle interruption context BEFORE storing the new user message
           // This ensures we update any interrupted message (including welcome) first
           if (interruption_context?.previous_turn_interrupted) {
-            console.log('Handling interruption:', interruption_context)
+            console.log('Handling interruption:', {
+              assistant_turn_id: interruption_context.assistant_turn_id,
+              text_heard: interruption_context.text_heard?.substring(0, 50),
+              words_heard: interruption_context.words_heard
+            })
 
             // Find and update the interrupted assistant message
-            const interruptedMsg = conversationMessages[conversationKey].findLast(
-              m => m.role === 'assistant' && m.turn_id === interruption_context.assistant_turn_id
+            let interruptedMsg = conversationMessages[conversationKey].findLast(
+              m => m.role === 'assistant' && (
+                m.turn_id === interruption_context.assistant_turn_id ||
+                // Also check for welcome message interruption
+                (m.turn_id === 'welcome' && !interruption_context.assistant_turn_id)
+              )
             )
+
+            // If we still can't find it, just get the last assistant message
+            if (!interruptedMsg) {
+              interruptedMsg = conversationMessages[conversationKey].findLast(
+                m => m.role === 'assistant'
+              )
+            }
 
             if (interruptedMsg) {
               // Update with what was actually heard
-              interruptedMsg.content = interruption_context.text_heard
-              console.log(`Updated interrupted message: ${interruption_context.text_heard.substring(0, 50)}...`)
+              interruptedMsg.content = interruption_context.text_heard || ''
+              console.log(`Updated interrupted message: "${interruption_context.text_heard?.substring(0, 50)}..."`)
             } else {
-              // If we can't find the message (e.g., it was the welcome), add it
-              console.log('Interrupted message not found, likely welcome message')
-              // Check if last message is assistant, if not add the interrupted content
-              const lastMsg = conversationMessages[conversationKey][conversationMessages[conversationKey].length - 1]
-              if (!lastMsg || lastMsg.role !== 'assistant') {
-                conversationMessages[conversationKey].push({
-                  role: 'assistant',
-                  content: interruption_context.text_heard,
-                  turn_id: interruption_context.assistant_turn_id
-                })
-              }
+              // If we still can't find any assistant message, create one with the interrupted content
+              console.log('No assistant message found, creating one with interrupted content')
+              conversationMessages[conversationKey].push({
+                role: 'assistant',
+                content: interruption_context.text_heard || '',
+                turn_id: interruption_context.assistant_turn_id || 'interrupted'
+              })
             }
           }
 
