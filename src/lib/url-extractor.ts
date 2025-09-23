@@ -18,7 +18,7 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
 
   // Pattern to match explicit URLs (domains)
   // Improved to avoid matching Ph.D, M.D., etc.
-  const urlPattern = /(?:www\.|https?:\/\/)?([a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)?)/g
+  const urlPattern = /(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]{2,})+(?:\/[^\s]*)*/g
   const matches = answer.match(urlPattern)
 
   if (matches) {
@@ -46,17 +46,21 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
       // For Airtable forms, show cleaner display text
       let displayText = cleanMatch
       if (cleanUrl.includes('airtable.com')) {
-        if (cleanUrl.includes('guest')) {
+        // Check by app ID for more reliable matching
+        if (cleanUrl.includes('app3khvqyh3rdqa5g')) {
           displayText = 'Guest Suggestion Form'
-        } else if (cleanUrl.includes('sponsor')) {
+        } else if (cleanUrl.includes('app9yIGPaaYyDlhxz')) {
           displayText = 'Sponsorship Form'
-        } else if (cleanUrl.includes('speaking') || cleanUrl.includes('appzMBzeGsDceqhoE')) {
+        } else if (cleanUrl.includes('appzMBzeGsDceqhoE')) {
           displayText = 'Speaking Request Form'
-        } else if (cleanUrl.includes('podcast') || cleanUrl.includes('appDg88FrbCxePxpG')) {
+        } else if (cleanUrl.includes('appDg88FrbCxePxpG')) {
           displayText = 'Podcast Invitation Form'
         } else {
           displayText = 'Submission Form'
         }
+      } else {
+        // For non-Airtable URLs, remove https:// for cleaner display
+        displayText = cleanMatch.replace(/^https?:\/\/(www\.)?/, '')
       }
 
       links.push({
