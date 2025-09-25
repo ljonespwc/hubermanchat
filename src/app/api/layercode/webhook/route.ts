@@ -19,15 +19,17 @@ const conversationMessages: Record<string, MessageWithTurnId[]> = {}
 type WebhookRequest = {
   conversation_id: string
   session_id?: string
-  text: string
-  turn_id: string
+  text?: string
+  turn_id?: string
   interruption_context?: {
     previous_turn_interrupted: boolean
     words_heard: number
     text_heard: string
     assistant_turn_id?: string
   }
-  type: 'message' | 'session.start' | 'session.update' | 'session.end'
+  type: 'message' | 'session.start' | 'session.update' | 'session.end' | 'user.transcript.interim_delta' | string
+  content?: string
+  delta_counter?: number
 }
 
 export async function POST(request: Request) {
@@ -80,6 +82,12 @@ export async function POST(request: Request) {
 
         if (type === 'session.update') {
           // Just acknowledge session update events
+          stream.end()
+          return
+        }
+
+        if (type === 'user.transcript.interim_delta') {
+          // Interim transcripts are for real-time display only, no action needed
           stream.end()
           return
         }
