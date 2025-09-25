@@ -139,17 +139,17 @@ export async function POST(request: Request) {
             // Stream the FAQ match response
             const streamResult = await streamFAQMatch(text, conversationMessages[conversationKey])
 
-            // Stream the text as it's generated and collect for history
-            const chunks: string[] = []
-
-            // The textStream from Vercel AI SDK should be passed directly
-            await stream.ttsTextStream(streamResult.textStream)
-
-            // Use the onFinish callback to get the full response
+            // Get the full response text first to check for markers
             const fullResponse = await streamResult.text
 
-            // After streaming completes, extract metadata and track
+            // Extract metadata and check for NO_MATCH marker
             const metadata = await extractStreamMetadata(text, fullResponse)
+
+            // Use the clean response (with marker removed) for TTS
+            const responseForTTS = metadata.cleanResponse || fullResponse
+
+            // Send the clean response via TTS
+            stream.tts(responseForTTS)
 
             // Track conversation
             const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hubermanchat.vercel.app'
@@ -165,10 +165,10 @@ export async function POST(request: Request) {
               })
             }).catch(() => {})
 
-            // Update conversation history with the full response
+            // Update conversation history with the clean response (no markers)
             conversationMessages[conversationKey][assistantPlaceholderIndex] = {
               role: 'assistant',
-              content: fullResponse,
+              content: responseForTTS,
               turn_id
             }
 
@@ -176,7 +176,7 @@ export async function POST(request: Request) {
             stream.data({
               type: metadata.matched ? 'faq_match' : 'no_match',
               question: text,
-              response: fullResponse,
+              response: responseForTTS,
               category: metadata.category,
               urls: { hasLinks: false, links: [] } // URLs can be extracted if needed
             })

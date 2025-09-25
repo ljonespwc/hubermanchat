@@ -79,8 +79,9 @@ export async function streamFAQMatch(
   const systemPrompt = `You are a helpful assistant for the Huberman Lab podcast website.
 You have access to a comprehensive FAQ database and should provide natural, conversational responses.
 When a user's question matches an FAQ, provide the answer in a natural, voice-friendly way.
-If there's no match, politely decline in one brief sentence.
-Keep responses concise and suitable for voice output.`
+If there's no match, start your response with [NO_MATCH] then provide a polite decline in one brief sentence.
+Keep responses concise and suitable for voice output.
+IMPORTANT: Only use [NO_MATCH] when the question doesn't match any FAQ or context.`
 
   // Create the user prompt with all FAQs
   const userPrompt = `Find the best matching FAQ for this user question.
@@ -127,8 +128,16 @@ Instructions:
 export async function extractStreamMetadata(
   userQuestion: string,
   response: string
-): Promise<{ matched: boolean; category?: string }> {
-  // Simple heuristic: if the response is a short decline, it's not matched
+): Promise<{ matched: boolean; category?: string; cleanResponse?: string }> {
+  // Check for the NO_MATCH marker
+  if (response.startsWith('[NO_MATCH]')) {
+    return {
+      matched: false,
+      cleanResponse: response.replace('[NO_MATCH]', '').trim()
+    }
+  }
+
+  // Fallback: Check for common decline patterns (in case marker is missed)
   const declinePatterns = [
     "don't have information",
     "can't help with",
@@ -138,7 +147,15 @@ export async function extractStreamMetadata(
     "not something I can",
     "don't have more information",
     "specific detail isn't",
-    "not equipped to"
+    "not equipped to",
+    "unable to provide",
+    "can't provide",
+    "not in my knowledge",
+    "beyond my scope",
+    "outside my expertise",
+    "that's not something",
+    "I focus on",
+    "I'm here to help with"
   ]
 
   const isDecline = declinePatterns.some(pattern =>
@@ -146,7 +163,7 @@ export async function extractStreamMetadata(
   )
 
   if (isDecline) {
-    return { matched: false }
+    return { matched: false, cleanResponse: response }
   }
 
   // Try to determine category based on response content
@@ -169,5 +186,5 @@ export async function extractStreamMetadata(
     category = 'About Dr. Huberman'
   }
 
-  return { matched: true, category }
+  return { matched: true, category, cleanResponse: response }
 }
