@@ -1,17 +1,5 @@
-import { OpenAI } from 'openai'
+import { getAIProvider, getCurrentProviderName, type AIMessage } from './ai-provider'
 import faqData from '../../docs/huberman_lab_faqs.json'
-
-// OpenAI client (singleton)
-let openaiClient: OpenAI | null = null
-
-function getOpenAIClient(): OpenAI {
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY!
-    })
-  }
-  return openaiClient
-}
 
 export interface FAQMatch {
   question: string
@@ -107,18 +95,19 @@ Instructions:
 - Make the natural answer sound friendly and conversational for voice output
 - Keep core facts accurate but rephrase for natural speech`
 
-    const openai = getOpenAIClient()
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.3, // Low but allows some natural variation
-      max_tokens: 200 // Need more for natural answer
+    const aiProvider = getAIProvider()
+    console.log(`🤖 Using ${aiProvider.getName()} for FAQ matching`)
+
+    const messages: AIMessage[] = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ]
+
+    const response = await aiProvider.generateCompletion(messages, {
+      temperature: 0.3,
+      maxTokens: 200
     })
 
-    const response = completion.choices[0].message.content?.trim() || 'none'
     console.log(`🤖 AI matcher response: ${response.substring(0, 100)}...`)
 
     // Parse the response
@@ -235,23 +224,22 @@ Examples of good brief declines:
 
 Generate a brief, natural decline (one sentence).`
 
-    const openai = getOpenAIClient()
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.7, // More variation to avoid repetition
-      max_tokens: 30 // Shorter limit for brief responses
+    const aiProvider = getAIProvider()
+    const messages: AIMessage[] = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ]
+
+    const naturalResponse = await aiProvider.generateCompletion(messages, {
+      temperature: 0.7,
+      maxTokens: 30
     })
 
-    const naturalResponse = completion.choices[0].message.content?.trim() ||
-      "I don't have information about that."
+    const finalResponse = naturalResponse || "I don't have information about that."
 
     return {
       type: 'no_match',
-      response: naturalResponse
+      response: finalResponse
     }
   } catch (error) {
     console.error('Failed to generate natural decline:', error)
