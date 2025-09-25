@@ -31,11 +31,16 @@ function getAIModel() {
 /**
  * Stream FAQ matching responses using Vercel AI SDK
  * Returns a text stream that can be consumed by Layercode's ttsTextStream
+ * Also returns metadata about which FAQ was matched for URL extraction
  */
 export async function streamFAQMatch(
   userQuestion: string,
   conversationHistory?: Array<{ role: string; content: string }>
-) {
+): Promise<{
+  textStream: any;
+  text: Promise<string>;
+  matchedFAQ?: { question: string; answer: string; category: string }
+}> {
   // Prepare all FAQs in a numbered list
   const faqList: Array<{ num: number; question: string; answer: string; category: string }> = []
   let num = 1
@@ -94,12 +99,13 @@ ${faqList.map(faq =>
 ).join('\n\n')}${knowledgeContext}
 
 Instructions:
-- If there's a good match, provide a natural, conversational version of the answer (2-3 sentences max)
+- If there's a good match, start your response with [FAQ:NUMBER] then provide a natural, conversational version of the answer (2-3 sentences max)
+- IMPORTANT: When you see URLs in the answer, DO NOT read them out. Instead, replace them with natural phrases like "using the form", "through the link provided", "via the submission form", etc.
 - If it's about Dr. Huberman's background and no FAQ matches, use the Additional Context
-- If no relevant match exists, respond with a brief, polite decline (one sentence)
+- If no relevant match exists, start with [NO_MATCH] then respond with a brief, polite decline (one sentence)
 - Make the response sound friendly and natural for voice output
-- Don't mention FAQ numbers or say "according to the FAQ"
-- Just provide the natural response directly`
+- Don't mention FAQ numbers in your spoken response
+- Just provide the natural response directly after the marker`
 
   // Convert conversation history to Vercel AI SDK format
   const messages: CoreMessage[] = [
@@ -118,7 +124,13 @@ Instructions:
     maxRetries: 2,
   })
 
-  return result
+  // Create a wrapper that includes FAQ metadata
+  return {
+    textStream: result.textStream,
+    text: result.text,
+    // We'll extract the matched FAQ from the response text later
+    matchedFAQ: undefined // Will be populated by extractStreamMetadata
+  }
 }
 
 /**
@@ -128,12 +140,53 @@ Instructions:
 export async function extractStreamMetadata(
   userQuestion: string,
   response: string
-): Promise<{ matched: boolean; category?: string; cleanResponse?: string }> {
+): Promise<{
+  matched: boolean;
+  category?: string;
+  cleanResponse?: string;
+  faqNumber?: number;
+  originalAnswer?: string;
+}> {
   // Check for the NO_MATCH marker
   if (response.startsWith('[NO_MATCH]')) {
     return {
       matched: false,
       cleanResponse: response.replace('[NO_MATCH]', '').trim()
+    }
+  }
+
+  // Check for FAQ number marker
+  const faqMatch = response.match(/^\[FAQ:(\d+)\]/)
+  if (faqMatch) {
+    const faqNumber = parseInt(faqMatch[1])
+    const cleanResponse = response.replace(faqMatch[0], '').trim()
+
+    // Get the original FAQ data
+    let matchedFAQ = null
+    let num = 1
+    for (const category of faqData.categories) {
+      for (const qa of category.questions) {
+        if (num === faqNumber) {
+          matchedFAQ = {
+            question: qa.question,
+            answer: qa.answer,
+            category: category.name
+          }
+          break
+        }
+        num++
+      }
+      if (matchedFAQ) break
+    }
+
+    if (matchedFAQ) {
+      return {
+        matched: true,
+        category: matchedFAQ.category,
+        cleanResponse,
+        faqNumber,
+        originalAnswer: matchedFAQ.answer
+      }
     }
   }
 

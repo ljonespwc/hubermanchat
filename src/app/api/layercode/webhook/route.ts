@@ -142,14 +142,20 @@ export async function POST(request: Request) {
             // Get the full response text first to check for markers
             const fullResponse = await streamResult.text
 
-            // Extract metadata and check for NO_MATCH marker
+            // Extract metadata and check for NO_MATCH/FAQ markers
             const metadata = await extractStreamMetadata(text, fullResponse)
 
-            // Use the clean response (with marker removed) for TTS
+            // Use the clean response (with markers removed) for TTS
             const responseForTTS = metadata.cleanResponse || fullResponse
 
             // Send the clean response via TTS
             stream.tts(responseForTTS)
+
+            // Extract URLs from the original FAQ answer if we have it
+            let urlData: any = { hasLinks: false, links: [] }
+            if (metadata.originalAnswer) {
+              urlData = extractURLsFromAnswer(metadata.originalAnswer)
+            }
 
             // Track conversation
             const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hubermanchat.vercel.app'
@@ -172,13 +178,13 @@ export async function POST(request: Request) {
               turn_id
             }
 
-            // Send metadata (URLs will be handled separately if needed)
+            // Send metadata with extracted URLs
             stream.data({
               type: metadata.matched ? 'faq_match' : 'no_match',
               question: text,
               response: responseForTTS,
               category: metadata.category,
-              urls: { hasLinks: false, links: [] } // URLs can be extracted if needed
+              urls: urlData // Now includes actual extracted URLs!
             })
 
           } else {

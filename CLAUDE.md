@@ -10,9 +10,21 @@ Always use this project_id when interacting with Supabase MCP tools.
 ## IMPORTANT: FAQ Data Management
 **DO NOT MODIFY** the `/docs/huberman_lab_faqs.json` file without explicit user request. This file contains carefully curated FAQ content including specific Airtable form URLs that were manually added. Only make changes to this file when specifically instructed by the user, and only modify exactly what is requested.
 
-## Recent Updates (Sept 25, 2025)
+## Recent Updates (Sept 25, 2025 - Evening)
 
-### Latest Updates
+### Streaming Fixes
+- **Fixed "No Match" Tracking**: Declined responses now correctly tracked as `matched: false`
+  - Added `[NO_MATCH]` marker detection in streaming responses
+  - Markers stripped before TTS to keep responses clean
+- **Fixed URL Handling**: AI no longer reads URLs character-by-character
+  - Added explicit prompt instruction to replace URLs with natural phrases
+  - Implemented `[FAQ:NUMBER]` marker to track matched FAQs
+  - URLs extracted from original FAQ answers and displayed in widget
+  - AI says "using the form" while widget shows clickable "Guest Suggestion Form"
+
+## Recent Updates (Sept 25, 2025 - Afternoon)
+
+### Feature Updates
 - **Streaming LLM Responses**: Implemented real-time streaming using Vercel AI SDK
   - Faster perceived response time - users hear the beginning immediately
   - More natural conversation flow with gradual response
