@@ -1,5 +1,6 @@
 import { streamResponse } from '@layercode/node-server-sdk'
 import { matchFAQWithAI, type FAQMatch, type NoMatchResponse } from '@/lib/faq-ai-matcher'
+import { streamFAQMatch, extractStreamMetadata } from '@/lib/faq-ai-matcher-streaming'
 import { extractURLsFromAnswer } from '@/lib/url-extractor'
 
 export const dynamic = 'force-dynamic'
@@ -128,83 +129,139 @@ export async function POST(request: Request) {
             turn_id
           })
 
-          // Use AI to match with FAQ, passing conversation history for context
-          const result = await matchFAQWithAI(text, conversationMessages[conversationKey])
+          // Check if streaming is enabled (can be controlled via env var)
+          const useStreaming = process.env.USE_STREAMING !== 'false' // Default to true
 
-          // Track conversation (fire and forget for speed)
-          // For direct /widget testing, use the widget URL as page_url
-          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hubermanchat.vercel.app'
-          fetch(`${appUrl}/api/track`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              session_id: session_id || conversation_id || 'unknown',
+          if (useStreaming) {
+            // STREAMING VERSION - Faster perceived response time
+            console.log('🚀 Using streaming response')
+
+            // Stream the FAQ match response
+            const streamResult = await streamFAQMatch(text, conversationMessages[conversationKey])
+
+            // Stream the text as it's generated and collect for history
+            const chunks: string[] = []
+
+            // The textStream from Vercel AI SDK should be passed directly
+            await stream.ttsTextStream(streamResult.textStream)
+
+            // Use the onFinish callback to get the full response
+            const fullResponse = await streamResult.text
+
+            // After streaming completes, extract metadata and track
+            const metadata = await extractStreamMetadata(text, fullResponse)
+
+            // Track conversation
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hubermanchat.vercel.app'
+            fetch(`${appUrl}/api/track`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                session_id: session_id || conversation_id || 'unknown',
+                question: text,
+                matched: metadata.matched,
+                category: metadata.category || null,
+                page_url: `${appUrl}/widget`
+              })
+            }).catch(() => {})
+
+            // Update conversation history with the full response
+            conversationMessages[conversationKey][assistantPlaceholderIndex] = {
+              role: 'assistant',
+              content: fullResponse,
+              turn_id
+            }
+
+            // Send metadata (URLs will be handled separately if needed)
+            stream.data({
+              type: metadata.matched ? 'faq_match' : 'no_match',
               question: text,
-              matched: result ? !('type' in result && result.type === 'no_match') : false,
-              category: result && 'category' in result ? result.category : null,
-              page_url: `${appUrl}/widget` // Default to widget page for direct testing
+              response: fullResponse,
+              category: metadata.category,
+              urls: { hasLinks: false, links: [] } // URLs can be extracted if needed
             })
-          }).catch(() => {}) // Ignore tracking errors
 
-          let finalResponse = ''
+          } else {
+            // NON-STREAMING VERSION (fallback)
+            console.log('📦 Using non-streaming response')
 
-          if (result) {
-            if ('type' in result && result.type === 'no_match') {
-              // AI generated a natural decline message
-              finalResponse = result.response
+            // Use AI to match with FAQ, passing conversation history for context
+            const result = await matchFAQWithAI(text, conversationMessages[conversationKey])
+
+            // Track conversation (fire and forget for speed)
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hubermanchat.vercel.app'
+            fetch(`${appUrl}/api/track`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                session_id: session_id || conversation_id || 'unknown',
+                question: text,
+                matched: result ? !('type' in result && result.type === 'no_match') : false,
+                category: result && 'category' in result ? result.category : null,
+                page_url: `${appUrl}/widget`
+              })
+            }).catch(() => {})
+
+            let finalResponse = ''
+
+            if (result) {
+              if ('type' in result && result.type === 'no_match') {
+                // AI generated a natural decline message
+                finalResponse = result.response
+                stream.tts(finalResponse)
+
+                // Send metadata about no match
+                stream.data({
+                  type: 'no_match',
+                  question: text,
+                  response: finalResponse,
+                  urls: { hasLinks: false, links: [] }
+                })
+              } else {
+                // We have a FAQ match - stream the natural answer
+                const faqMatch = result as FAQMatch
+                finalResponse = faqMatch.naturalAnswer
+
+                // If it's a medium confidence match, add a follow-up
+                if (faqMatch.confidence === 'medium') {
+                  finalResponse += " Was that what you were looking for?"
+                }
+
+                stream.tts(finalResponse)
+
+                // Extract URLs from the original answer
+                const urlData = extractURLsFromAnswer(faqMatch.answer)
+
+                // Send metadata about the FAQ match with URL data
+                stream.data({
+                  type: 'faq_match',
+                  question: faqMatch.question,
+                  answer: finalResponse,
+                  originalAnswer: faqMatch.answer,
+                  confidence: faqMatch.confidence,
+                  category: faqMatch.category,
+                  urls: urlData
+                })
+              }
+            } else {
+              // Fallback if something went wrong
+              finalResponse = "I'm sorry, I don't have specific information about that. Is there something else about Huberman Lab I can help you with?"
               stream.tts(finalResponse)
 
-              // Send metadata about no match
               stream.data({
                 type: 'no_match',
                 question: text,
                 response: finalResponse,
                 urls: { hasLinks: false, links: [] }
               })
-            } else {
-              // We have a FAQ match - stream the natural answer
-              const faqMatch = result as FAQMatch // Type assertion
-              finalResponse = faqMatch.naturalAnswer
-
-              // If it's a medium confidence match, add a follow-up
-              if (faqMatch.confidence === 'medium') {
-                finalResponse += " Was that what you were looking for?"
-              }
-
-              stream.tts(finalResponse)
-
-              // Extract URLs from the original answer
-              const urlData = extractURLsFromAnswer(faqMatch.answer)
-
-              // Send metadata about the FAQ match with URL data
-              stream.data({
-                type: 'faq_match',
-                question: faqMatch.question,
-                answer: finalResponse,
-                originalAnswer: faqMatch.answer,
-                confidence: faqMatch.confidence,
-                category: faqMatch.category,
-                urls: urlData
-              })
             }
-          } else {
-            // Fallback if something went wrong
-            finalResponse = "I'm sorry, I don't have specific information about that. Is there something else about Huberman Lab I can help you with?"
-            stream.tts(finalResponse)
 
-            stream.data({
-              type: 'no_match',
-              question: text,
-              response: finalResponse,
-              urls: { hasLinks: false, links: [] }
-            })
-          }
-
-          // Update the assistant placeholder with the actual response
-          conversationMessages[conversationKey][assistantPlaceholderIndex] = {
-            role: 'assistant',
-            content: finalResponse,
-            turn_id
+            // Update the assistant placeholder with the actual response
+            conversationMessages[conversationKey][assistantPlaceholderIndex] = {
+              role: 'assistant',
+              content: finalResponse,
+              turn_id
+            }
           }
 
           // Clean up old conversations to prevent memory leak (keep last 50 active conversations)

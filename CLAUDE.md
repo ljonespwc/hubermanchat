@@ -10,9 +10,22 @@ Always use this project_id when interacting with Supabase MCP tools.
 ## IMPORTANT: FAQ Data Management
 **DO NOT MODIFY** the `/docs/huberman_lab_faqs.json` file without explicit user request. This file contains carefully curated FAQ content including specific Airtable form URLs that were manually added. Only make changes to this file when specifically instructed by the user, and only modify exactly what is requested.
 
-## Recent Updates (Sept 23, 2025)
+## Recent Updates (Sept 25, 2025)
 
 ### Latest Updates
+- **Streaming LLM Responses**: Implemented real-time streaming using Vercel AI SDK
+  - Faster perceived response time - users hear the beginning immediately
+  - More natural conversation flow with gradual response
+  - Better interruption handling during responses
+  - Works with both OpenAI and Gemini providers
+- **AI Provider Switching**: Easy toggle between GPT-4.1-mini and Gemini-2.5-flash-lite
+  - Set `AI_PROVIDER=openai` or `AI_PROVIDER=gemini` in environment
+  - Gemini is 3-4x faster (~800ms vs ~3s response time)
+  - No code changes needed to switch providers
+
+## Recent Updates (Sept 23, 2025)
+
+### Previous Updates
 - **Fixed Database Tracking**: Resolved foreign key constraint issue - sessions must be created before messages
 - **Airtable Form URLs Added**: All form references now have actual clickable Airtable URLs
 - **Clean URL Display**: Airtable forms show as friendly names (e.g., "Guest Suggestion Form") instead of long URLs
