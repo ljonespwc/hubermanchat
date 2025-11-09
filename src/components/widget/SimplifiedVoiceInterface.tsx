@@ -75,16 +75,12 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
     }
   }, [isSpeaking, isListening, hasHadFirstInteraction])
 
-  // Hide URLs when agent stops speaking
+  // Hide URLs when user starts speaking (asking next question)
   useEffect(() => {
-    if (!isListening && showURLs) {
-      // Keep URLs visible for a moment after speaking stops
-      const timer = setTimeout(() => {
-        setShowURLs(false)
-      }, 3000)
-      return () => clearTimeout(timer)
+    if (isSpeaking && showURLs) {
+      setShowURLs(false)
     }
-  }, [isListening, showURLs])
+  }, [isSpeaking, showURLs])
 
   // Removed debug logging
 
