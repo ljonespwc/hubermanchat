@@ -2,11 +2,74 @@ export interface ExtractedLink {
   type: 'url' | 'placeholder'
   text: string
   href?: string
+  description?: string
 }
 
 export interface URLExtractionResult {
   hasLinks: boolean
   links: ExtractedLink[]
+}
+
+/**
+ * Generate a helpful description for a URL based on its type and content
+ */
+function generateURLDescription(cleanUrl: string, displayText: string): string {
+  // Airtable forms - specific descriptions
+  if (cleanUrl.includes('airtable.com')) {
+    if (cleanUrl.includes('app3khvqyh3rdqa5g')) {
+      return 'Submit your guest or topic recommendations'
+    } else if (cleanUrl.includes('app9yIGPaaYyDlhxz')) {
+      return 'Suggest companies for podcast sponsorship'
+    } else if (cleanUrl.includes('appzMBzeGsDceqhoE')) {
+      return 'Invite Dr. Huberman to speak at your event'
+    } else if (cleanUrl.includes('appDg88FrbCxePxpG')) {
+      return 'Invite Dr. Huberman as a podcast guest'
+    }
+    return 'Fill out this form'
+  }
+
+  // Newsletter signup
+  if (cleanUrl.includes('hubermanlab.com/newsletter')) {
+    return 'Sign up for the free monthly newsletter'
+  }
+
+  // Events
+  if (cleanUrl.includes('hubermanlab.com/events')) {
+    return 'View upcoming live events and get notified'
+  }
+
+  // Premium/Supercast
+  if (cleanUrl.includes('supercast.com') || cleanUrl.includes('subscribe')) {
+    return 'Learn more about premium membership'
+  }
+
+  // Support articles
+  if (cleanUrl.includes('support.supercast.com')) {
+    return 'View help articles and troubleshooting guides'
+  }
+
+  // Shop
+  if (cleanUrl.includes('shop.hubermanlab.com')) {
+    return 'Browse official Huberman Lab merchandise'
+  }
+
+  // Stanford lab
+  if (cleanUrl.includes('hubermanlab.stanford.edu')) {
+    if (cleanUrl.includes('publications')) {
+      return 'View published research papers'
+    } else if (cleanUrl.includes('giving')) {
+      return 'Support the Stanford lab research'
+    }
+    return 'Visit the official Stanford lab website'
+  }
+
+  // General search
+  if (cleanUrl.includes('hubermanlab.com/search')) {
+    return 'Search all podcast episodes and topics'
+  }
+
+  // Default for other URLs
+  return 'Learn more'
 }
 
 /**
@@ -66,7 +129,8 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
       links.push({
         type: 'url',
         text: displayText,
-        href: cleanUrl
+        href: cleanUrl,
+        description: generateURLDescription(cleanUrl, displayText)
       })
     })
   }
@@ -99,7 +163,8 @@ export function extractURLsFromAnswer(answer: string): URLExtractionResult {
         links.push({
           type: 'url',
           text: displayText,
-          href: url
+          href: url,
+          description: generateURLDescription(url, displayText)
         })
       }
     }

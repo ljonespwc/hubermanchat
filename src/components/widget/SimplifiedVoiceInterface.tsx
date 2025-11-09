@@ -182,8 +182,8 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
           </motion.p>
         </div>
 
-        {/* URL Display Area */}
-        <div className="min-h-[32px] flex items-center justify-center">
+        {/* URL Display Area - Card Style */}
+        <div className="w-full max-w-md px-4">
           <AnimatePresence>
             {showURLs && currentURLs?.hasLinks && (
               <motion.div
@@ -191,26 +191,50 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-1 text-center"
+                className="space-y-2"
               >
                 {currentURLs.links.map((link, index) => (
-                  <div key={index} className="text-xs text-gray-500 dark:text-gray-400 max-w-full px-4">
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ scale: 1.01 }}
+                  >
                     {link.type === 'url' ? (
                       <a
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 hover:text-huberman-secondary transition-colors underline break-all"
+                        className="block w-full border-2 border-gray-300 bg-white rounded-md px-4 py-3 hover:border-huberman-secondary hover:shadow-lg transition-all duration-200"
                       >
-                        {link.text}
-                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <ExternalLink className="w-5 h-5 text-huberman-secondary flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-base font-medium text-gray-900 truncate">
+                                {link.text}
+                              </div>
+                              {link.description && (
+                                <div className="text-sm text-gray-500 mt-0.5">
+                                  {link.description}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        </div>
                       </a>
                     ) : (
-                      <span className="text-gray-400 italic">
-                        {link.text}
-                      </span>
+                      <div className="block w-full border-2 border-gray-200 bg-gray-50 rounded-md px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="text-base text-gray-400 italic">
+                            {link.text}
+                          </div>
+                        </div>
+                      </div>
                     )}
-                  </div>
+                  </motion.div>
                 ))}
               </motion.div>
             )}
