@@ -208,21 +208,18 @@ export default function SimplifiedVoiceInterface({ onClose }: SimplifiedVoiceInt
                         rel="noopener noreferrer"
                         className="block w-full border-2 border-gray-300 bg-white rounded-md px-4 py-3 hover:border-huberman-secondary hover:shadow-lg transition-all duration-200"
                       >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <ExternalLink className="w-5 h-5 text-huberman-secondary flex-shrink-0 mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-base font-medium text-gray-900 truncate">
-                                {link.text}
-                              </div>
-                              {link.description && (
-                                <div className="text-sm text-gray-500 mt-0.5">
-                                  {link.description}
-                                </div>
-                              )}
+                        <div className="flex items-start gap-3">
+                          <ExternalLink className="w-5 h-5 text-huberman-secondary flex-shrink-0 mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-base font-medium text-gray-900 truncate">
+                              {link.text}
                             </div>
+                            {link.description && (
+                              <div className="text-sm text-gray-500 mt-0.5">
+                                {link.description}
+                              </div>
+                            )}
                           </div>
-                          <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
                         </div>
                       </a>
                     ) : (
